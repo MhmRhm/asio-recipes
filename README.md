@@ -169,7 +169,7 @@ steps. The command above executes all these steps in one go.
 To install all necessary packages, use:
 
 ```bash
-sudo apt-get install doxygen graphviz
+sudo apt-get install doxygen graphviz mscgen dia
 sudo apt-get install clang-format
 sudo apt-get install valgrind gawk
 sudo apt-get install cppcheck
