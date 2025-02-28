@@ -3,7 +3,8 @@
 A feature-packed, ready-to-use, cross-platform CMake template with testing,
 static and dynamic checks, coverage reports, and more.
 
-This template comes with a tutorial and a working example, so be sure to read on.
+This template comes with a [tutorial](https://mhmrhm.github.io/tutorials/posts/see-make/)
+and a [working example](https://github.com/MhmRhm/FTowerX), so be sure to read on.
 
 1. [Included Features](#included-eatures)
 2. [Before You Begin](#before-you-begin)
@@ -354,10 +355,11 @@ cmake --workflow --preset linux-default-release
 
 ## First Step
 
-After developing your library using this template, your users will need to add it
-as an external dependency. One easy way to do this is by using CMake's
-`FetchContent`. This template has already set things up, so your users can add
-your library like this:
+One man's final step is another man's first step. After developing your
+library using this template, your users will need to add it as an external
+dependency. One easy way to do this is by using CMake's `FetchContent`. This
+template has already set things up, so your users can add your library like
+this:
 
 ```cmake
 # CMakeLists.txt
