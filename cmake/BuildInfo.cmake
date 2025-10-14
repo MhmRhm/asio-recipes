@@ -1,7 +1,7 @@
 include_guard(GLOBAL)
 
 set(BUILDINFO_TEMPLATE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/buildinfo")
+set(DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 string(TIMESTAMP TIMESTAMP)
 find_package(Git)
@@ -57,7 +57,7 @@ endif()
 
 configure_file(
 	"${BUILDINFO_TEMPLATE_DIR}/buildinfo.h.in"
-	"${DESTINATION}/buildinfo.h" @ONLY
+	"${DESTINATION}/buildinfo/buildinfo.h" @ONLY
 )
 
 function(BuildInfo target)

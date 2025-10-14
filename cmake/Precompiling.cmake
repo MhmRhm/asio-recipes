@@ -9,5 +9,6 @@ target_precompile_headers(precompiled INTERFACE
 	<format>
 	<memory>
 	<cstddef>
+	<cstdint>
 	<stdexcept>
 )

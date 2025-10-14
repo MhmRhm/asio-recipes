@@ -1,5 +1,5 @@
 #include "libsee/see_model.h"
-#include "buildinfo.h"
+#include "buildinfo/buildinfo.h"
 
 std::string getVersion() {
   std::string version_str{std::format("{} - {} - {}", BuildInfo::Branch,
