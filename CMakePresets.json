@@ -437,37 +437,43 @@
 			"name": "windows-test-debug",
 			"displayName": "Windows Test Debug",
 			"description": "Tests the debug build type",
-			"configurePreset": "windows-default-debug"
+			"configurePreset": "windows-default-debug",
+			"configuration": "Debug"
 		},
 		{
 			"name": "windows-test-release",
 			"displayName": "Windows Test Release",
 			"description": "Tests the release build type",
-			"configurePreset": "windows-default-release"
+			"configurePreset": "windows-default-release",
+			"configuration": "Release"
 		},
 		{
 			"name": "windows-x86-test-debug",
 			"displayName": "Windows x86 Test Debug",
 			"description": "Tests the debug build type",
-			"configurePreset": "windows-x86-debug"
+			"configurePreset": "windows-x86-debug",
+			"configuration": "Debug"
 		},
 		{
 			"name": "windows-x86-test-release",
 			"displayName": "Windows x86 Test Release",
 			"description": "Tests the release build type",
-			"configurePreset": "windows-x86-release"
+			"configurePreset": "windows-x86-release",
+			"configuration": "Release"
 		},
 		{
 			"name": "windows-clang-test-debug",
 			"displayName": "Windows Clang Test Debug",
 			"description": "Tests the debug build type",
-			"configurePreset": "windows-clang-debug"
+			"configurePreset": "windows-clang-debug",
+			"configuration": "Debug"
 		},
 		{
 			"name": "windows-clang-test-release",
 			"displayName": "Windows Clang Test Release",
 			"description": "Tests the release build type",
-			"configurePreset": "windows-clang-release"
+			"configurePreset": "windows-clang-release",
+			"configuration": "Release"
 		},
 		{
 			"name": "mac-test-debug",
