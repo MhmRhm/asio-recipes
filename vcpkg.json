@@ -1,0 +1,9 @@
+{
+    "dependencies": [
+        "boost",
+        "protobuf",
+        "benchmark",
+        "gtest",
+        "ftxui"
+    ]
+}

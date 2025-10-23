@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.30.0)
 project(SeeMake VERSION 0.0.0 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
 
 enable_testing()
 

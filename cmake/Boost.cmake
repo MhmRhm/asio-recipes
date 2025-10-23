@@ -1,25 +1,9 @@
-include(FetchContent)
-
-FetchContent_Declare(
-	Boost
-	GIT_REPOSITORY https://github.com/boostorg/boost.git
-	GIT_TAG boost-1.89.0
-	GIT_SHALLOW 1
-)
-
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-set(BOOST_ENABLE_CMAKE ON)
-
-set(BOOST_INCLUDE_LIBRARIES
-	test
+find_package(Boost 1.89.0 REQUIRED COMPONENTS
+	unit_test_framework
 	system
-	coroutine
+	coroutine2
 	thread
 	regex
 	asio
 	program_options
 )
-
-FetchContent_MakeAvailable(Boost)

@@ -19,7 +19,9 @@
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/../${sourceDirName}-install-${presetName}",
 				"DEFAULT_CXX_COMPILE_FLAGS": "-g;-Wextra;-Wall;-Wfloat-equal;-Wundef;-Wpointer-arith;-Wshadow;-Wcast-align;-Wswitch-default;-Wswitch-enum;-Wconversion;-Wpedantic;-Werror",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O0"
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O0",
+				"CMAKE_TOOLCHAIN_FILE": "$penv{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"QTDIR": "$penv{HOME}/Qt/6.9.3/gcc_arm64"
 			}
 		},
 		{
@@ -40,7 +42,9 @@
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/../${sourceDirName}-install-${presetName}",
 				"DEFAULT_CXX_COMPILE_FLAGS": "-Wextra;-Wall;-Wfloat-equal;-Wundef;-Wpointer-arith;-Wshadow;-Wcast-align;-Wswitch-default;-Wswitch-enum;-Wconversion;-Wpedantic;-Werror",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O3"
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O3",
+				"CMAKE_TOOLCHAIN_FILE": "$penv{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"QTDIR": "$penv{HOME}/Qt/6.9.3/gcc_arm64"
 			}
 		},
 		{
@@ -64,8 +68,10 @@
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/../${sourceDirName}-install-${presetName}",
 				"CPPCHECK_INSTALL_DIR": "C:/Program Files/Cppcheck",
 				"CLANG-FORMAT_INSTALL_DIR": "C:/Program Files/LLVM/bin",
-				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/WX;/EHsc;/wd4668;/wd4710;/wd4711",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Od"
+				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/EHsc;/wd4668;/wd4710;/wd4711",
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Od",
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"QTDIR": "C:/Qt/6.9.3/msvc2022_arm64"
 			}
 		},
 		{
@@ -89,8 +95,10 @@
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/../${sourceDirName}-install-${presetName}",
 				"CPPCHECK_INSTALL_DIR": "C:/Program Files/Cppcheck",
 				"CLANG-FORMAT_INSTALL_DIR": "C:/Program Files/LLVM/bin",
-				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/WX;/EHsc;/wd4668;/wd4710;/wd4711",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Ox"
+				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/EHsc;/wd4668;/wd4710;/wd4711",
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Ox",
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"QTDIR": "C:/Qt/6.9.3/msvc2022_arm64"
 			}
 		},
 		{
@@ -119,8 +127,9 @@
 				"CPPCHECK_INSTALL_DIR": "C:/Program Files/Cppcheck",
 				"CLANG-FORMAT_INSTALL_DIR": "C:/Program Files/LLVM/bin",
 				"WIN_MSVC": "YES",
-				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/WX;/EHsc;/wd4668;/wd4710;/wd4711",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Od"
+				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/EHsc;/wd4668;/wd4710;/wd4711",
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Od",
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 			}
 		},
 		{
@@ -148,8 +157,9 @@
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/../${sourceDirName}-install-${presetName}",
 				"CPPCHECK_INSTALL_DIR": "C:/Program Files/Cppcheck",
 				"CLANG-FORMAT_INSTALL_DIR": "C:/Program Files/LLVM/bin",
-				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/WX;/EHsc;/wd4668;/wd4710;/wd4711",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Ox"
+				"DEFAULT_CXX_COMPILE_FLAGS": "/W4;/Wall;/EHsc;/wd4668;/wd4710;/wd4711",
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Ox",
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 			}
 		},
 		{
@@ -176,8 +186,10 @@
 				"CPPCHECK_INSTALL_DIR": "C:/Program Files/Cppcheck",
 				"CLANG-FORMAT_INSTALL_DIR": "C:/Program Files/LLVM/bin",
 				"WIN_CLANG": "YES",
-				"DEFAULT_CXX_COMPILE_FLAGS": "-g;-Wextra;-Wall;-Wfloat-equal;-Wundef;-Wpointer-arith;-Wshadow;-Wcast-align;-Wswitch-default;-Wswitch-enum;-Wconversion;-Wpedantic;-Werror",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O0"
+				"DEFAULT_CXX_COMPILE_FLAGS": "-g;-Wextra;-Wall;-Wfloat-equal;-Wundef;-Wpointer-arith;-Wshadow;-Wcast-align;-Wswitch-default;-Wswitch-enum;-Wconversion;-Wpedantic",
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O0",
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"QTDIR": "C:/Qt/6.9.3/msvc2022_arm64"
 			}
 		},
 		{
@@ -203,8 +215,10 @@
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/../${sourceDirName}-install-${presetName}",
 				"CPPCHECK_INSTALL_DIR": "C:/Program Files/Cppcheck",
 				"CLANG-FORMAT_INSTALL_DIR": "C:/Program Files/LLVM/bin",
-				"DEFAULT_CXX_COMPILE_FLAGS": "-Wextra;-Wall;-Wfloat-equal;-Wundef;-Wpointer-arith;-Wshadow;-Wcast-align;-Wswitch-default;-Wswitch-enum;-Wconversion;-Wpedantic;-Werror",
-				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O3"
+				"DEFAULT_CXX_COMPILE_FLAGS": "-Wextra;-Wall;-Wfloat-equal;-Wundef;-Wpointer-arith;-Wshadow;-Wcast-align;-Wswitch-default;-Wswitch-enum;-Wconversion;-Wpedantic",
+				"DEFAULT_CXX_OPTIMIZE_FLAG": "-O3",
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"QTDIR": "C:/Qt/6.9.3/msvc2022_arm64"
 			}
 		},
 		{

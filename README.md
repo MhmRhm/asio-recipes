@@ -7,13 +7,12 @@ This template comes with a [tutorial](https://mhmrhm.github.io/tutorials/posts/s
 and a [working example](https://github.com/MhmRhm/FTowerX), so be sure to read on.
 
 1. [Included Features](#included-eatures)
-2. [Before You Begin](#before-you-begin)
-3. [Using Dev Containers](#using-dev-containers)
-4. [Setting Up Linux](#setting-up-linux)
-5. [Setting Up Windows](#setting-up-windows)
-6. [Setting Up Mac](#setting-up-mac)
-7. [Final Step](#final-step)
-8. [First Step](#first-step)
+2. [Notes Before You Begin](#notes-before-you-begin)
+3. [Setting Up Linux](#setting-up-linux)
+4. [Setting Up Windows](#setting-up-windows)
+5. [Setting Up Mac](#setting-up-mac)
+6. [Final Step](#final-step)
+7. [First Step](#first-step)
 
 ## Included Features:
 
@@ -21,13 +20,14 @@ and a [working example](https://github.com/MhmRhm/FTowerX), so be sure to read o
 customization and expansion.
 - **One-Command Workflow**: Configure, build, test, and package your project with
 a single command.
-- **Minimal Demo Code**: Includes examples to build an object library, one static
-and one shared library, and an executable that links against them.
-- **Out-of-the-Box Support**: Comes with GoogleTest, Google Benchmark, and
-Boost.Test, with demo code for each.
+- **Minimal Demo Code**: Provides examples for building an object library, a
+static library, a shared library, and a bootstrapped executable that links
+against them.
+- **Out-of-the-Box Support**: Comes with GoogleTest, Google Benchmark,
+Boost.Test, Boost.Asio, and Protobuf, each with accompanying demo code.
 - **Simple Dependency Management**: Most dependencies are fetched using CMake's
-FetchContent, so there's no need to manually build and install Boost or Google
-libraries.
+FetchContent or vcpkg, so there's no need to manually build and install Boost or
+Google libraries.
 - **Static and Dynamic Checks**: Uses Memcheck and Cppcheck to perform dynamic
 and static checks.
 - **Git Information**: Easily include Git details like commit hash and branch
@@ -51,7 +51,7 @@ This work is based on material from
 by Rafał Świdziński, which is licensed under the MIT license. It is one of the
 most useful books I have read.
 
-For those using this template who want a deeper understanding, I’ve provided a
+For those using this template who want a deeper understanding, I've provided a
 tutorial on this template at
 [DotBashHistory](https://mhmrhm.github.io/tutorials/posts/see-make/).
 I highly recommend that you review the tutorial or at least examine each file in
@@ -62,101 +62,115 @@ I also have another project that implements the Model-View-Controller (MVC)
 design pattern, using this template as a foundation. You can check it out in
 action [here](https://github.com/MhmRhm/FTowerX).
 
-## Before You Begin
+## Notes Before You Begin
 
 I assume you will read this file in full before building the template. Below, I
 will outline the necessary steps to prepare your system for the build.
 
-Before continuing, note that this template uses CMake's FetchContent to include
-most dependencies. For large repositories like Boost, this process can take some
-time.
+Before continuing, note that this template uses CMake's FetchContent and vcpkg to
+manage dependencies. For large repositories such as Boost, the setup process may
+take some time, but you'll get library versions that are often many releases
+ahead of what system package managers provide.
 
-Modify the `test/CMakeLists.txt` to enable Boost:
+All necessary path variables used by this template are configured in the
+`CMakePresets.json` file. If your local installation paths for dependencies like
+vcpkg or Qt differ from the defaults, modify the entries in this file
+accordingly. For instance, when developing on Windows and using the Clang Release
+preset, locate the preset in the `.json` file and update its `cacheVariables`
+section to reflect your environment.
 
-```diff
---- a/test/CMakeLists.txt
-+++ b/test/CMakeLists.txt
-@@ -1,4 +1,4 @@
- include(Testing)
- 
- add_subdirectory(libsee)
--# add_subdirectory(see)
-+add_subdirectory(see)
-```
+If you're developing Qt applications in a terminal-based environment such as
+VS Code, running an executable that depends on Qt libraries may fail. This
+typically happens because the executable cannot locate the required Qt libraries
+at runtime.
 
-If you clean the build directory by running for example:
+There are several ways to resolve this issue:
+
+1. **Configure environment variables in VS Code:**
+   Add a [`launch.json`](https://code.visualstudio.com/docs/debugtest/debugging-configuration)
+   file and define the necessary environment variables so that VS Code sets them
+   automatically when launching your application.
+
+2. **Set environment variables manually:**
+   Add the required Qt library paths to your environment variables in the
+   terminal, then run your executable from that terminal session.
+
+3. **Use the Qt deployment tool (Windows):**
+   Run the *windeployqt* tool located at `C:\Qt\6.9.3\msvc2022_arm64\bin\windeployqt6.exe`
+   and provide the path to your executable. This will copy the required Qt
+   libraries next to your binary.
+
+If you’re using Qt Creator, the IDE automatically configures the necessary
+environment variables, so no manual setup is needed.
+
+To manually set the environment variables:
+
+**On Linux:**
 
 ```bash
-cmake --build --preset linux-default-release --target clean
+export LD_LIBRARY_PATH="/home/<username>/Qt/6.9.3/gcc_arm64/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="/home/<username>/Qt/6.9.3/gcc_arm64/bin:$LD_LIBRARY_PATH"
 ```
 
-or by deleting the `CMakeCache.txt` file, the next build will not trigger
-FetchContent. However, if you delete the entire build directory, the dependencies
-will be downloaded again. For large libraries, you might consider building them
-separately and then linking against them to avoid long download times. The latest
-version of CMake provides improved output during the content fetching process.
+**On Windows (PowerShell):**
 
-I've noticed that sometimes tests aren't discovered automatically when running a
-workflow for the first time using the VSCode CMake extension. If this happens,
-try running the configuration and build steps separately.
-
-```bash
-cmake --list-presets
-cmake --preset linux-default-release
-
-cmake --build --list-presets
-cmake --build --preset linux-default-release
+```powershell
+$Env:Path += ";C:\Qt\6.9.3\msvc2022_arm64\lib;C:\Qt\6.9.3\msvc2022_arm64\bin"
 ```
 
 Generating test coverage reports requires debug symbols, so coverage targets
 won't build for Release configurations.
 
-Keep in mind that on Windows, the file path length cannot exceed 260 characters.
-To avoid issues, avoid using lengthy folder names.
+Keep in mind that on Windows, file paths cannot exceed 260 characters. To prevent
+issues, use short folder names and avoid spaces in directory or file names.
 
 One last thing, I've encountered a situation on Windows where having Strawberry
 Perl installed can interfere with or disable Cppcheck. Just something to keep in
 mind.
 
-## Using Dev Containers
-
-The easiest way to use this template is by installing the VSCode's Dev
-Containers extension and opening the project directory in it.
-
-Everything will work out of the box except for `cmake/BuildInfo.cmake`. Running
-a `git status` command will indicate this issue. To fix it, simply run the
-following command inside the container terminal:
-
-```bash
-git config --global --add safe.directory /workspaces/SeeMake
-```
-
-That's it! You can start developing.
-
 ## Setting Up Linux
 
-To get started, you'll need to install Git and CMake. You can install CMake
-either from the default repositories or by adding the Kitware repository, which
-provides the latest CMake versions.
-
-For the latest version of CMake, visit the
-[Kitware APT Repository](https://apt.kitware.com).
+At a minimum, you'll need to install Git and CMake to get started. You can
+install CMake either from your system's default repositories or by adding the
+Kitware repository, which provides the latest versions.
 
 To install CMake and Git from the repositories, run:
 
 ```bash
-sudo apt-get install git cmake
+sudo apt-get -y install git cmake
 ```
 
-Next, install the compiler and debugger by running:
+Or for the latest version of CMake, visit the
+[Kitware APT Repository](https://apt.kitware.com).
+
+Next, install the compiler, debugger and some basic packages by running:
 
 ```bash
-sudo apt-get install build-essential gdb
+sudo apt-get install -y build-essential libgl1-mesa-dev gdb
+sudo apt-get install -y pkg-config autoconf autoconf-archive
+sudo apt-get install -y libtool curl zip unzip tar
+sudo apt-get install -y linux-headers-$(uname -r)
 ```
 
-This template includes a `CMakePresets.json` file with predefined workflows. To
-start, run the following command and review the output. If any packages are
-missing, you can install them, clean the build, and repeat the process:
+This template depends on vcpkg. Follow its
+[official documentation](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started)
+to install it. The `CMakePresets.json` file assumes that vcpkg is located in the
+user's `\home\<username>\vcpkg` directory. This template installs its
+dependencies using a vcpkg
+[manifest file](https://learn.microsoft.com/en-us/vcpkg/consume/manifest-mode).
+
+Installing vcpkg is straightforward and can be done with the following commands:
+
+```bash
+cd $HOME
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg && ./bootstrap-vcpkg.sh
+```
+
+At this point, you can proceed with a trial-and-error approach. This template
+includes a `CMakePresets.json` file with predefined workflows. To get started,
+run the following command and review the output. If any packages are missing,
+install them, clean the build directory, and try again.
 
 ```bash
 cmake --workflow --list-presets
@@ -164,18 +178,21 @@ cmake --workflow --preset linux-default-release
 cmake --build --preset linux-default-release --target clean
 ```
 
-In CMake, a workflow combines configuration, building, testing, and packaging
-steps. The command above executes all these steps in one go.
-
-To install all necessary packages, use:
+Alternatively, you can run the following commands to install the remaining
+required packages:
 
 ```bash
-sudo apt-get install doxygen graphviz mscgen dia
-sudo apt-get install clang-format
-sudo apt-get install valgrind gawk
-sudo apt-get install cppcheck
-sudo apt-get install lcov
+sudo apt-get -y install doxygen graphviz mscgen dia
+sudo apt-get -y install clang-format
+sudo apt-get -y install valgrind gawk
+sudo apt-get -y install cppcheck
+sudo apt-get -y install lcov
 ```
+
+For Qt installation, download the [online installer](https://www.qt.io/download-open-source)
+and follow the setup instructions. Qt packages are also available through most
+Linux distribution repositories. If you installed Qt using the online installer,
+update the `QTDIR` path in the `CMakePresets.json` file accordingly.
 
 The following tools are used in this project:
 
@@ -186,7 +203,7 @@ The following tools are used in this project:
 - **Lcov**: Generates coverage reports for tests in Debug.
 
 Many of these reports are available in HTML format and can be easily served. To
-serve a report, navigate to the corresponding directory and run:
+serve a report, navigate to the corresponding build directory and run:
 
 ```bash
 python3 -m http.server <port-number>
@@ -228,7 +245,7 @@ Examples:
 
 ## Setting Up Windows
 
-Setting up on Windows is quite different from Linux. On Windows, you’ll need to
+Setting up on Windows is quite different from Linux. On Windows, you'll need to
 manually find and install the required packages, making sure to add them to your
 system's Path. Most software you install will have an option to add it to the
 Path during installation, so no worries there. For any software that doesn't
@@ -239,7 +256,7 @@ software to set up this template. If you're developing on Windows on ARM, be sur
 to download the correct binary from the software provider. Some offer custom
 builds specifically for ARM architecture.
 
-Here’s the list of software you need to download and install:
+Here's the list of software you need to download and install:
 
 1. **[Git](https://git-scm.com/download/win)**: The default settings should be
 fine. I usually change the default branch name to "main" and disable Git GUI.
@@ -249,6 +266,16 @@ to the Path.
 
 3. **[Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)**:
 Select the "Desktop development with C++" option.
+
+4. **[Qt](https://www.qt.io/download-open-source)**: Standard setup. During
+installation, under Additional Libraries for your chosen Qt version, select the
+libraries you need. You'll likely not require any debug information files. In the
+Build Tools section, uncheck CMake. If you already have Qt installed, run the
+Maintenance Tool in your installation directory to add or install another version.
+
+5. **[vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---se)**:
+Standard vcpkg setup. The `CMakePresets.json` assumes it is installed directly
+under the C directory.
 
 This template includes a `CMakePresets.json` file with predefined workflows. To
 start, run the following command and review the output. If any packages are
@@ -261,16 +288,18 @@ cmake --workflow --preset windows-default-release
 cmake --build --preset windows-default-release --target clean
 ```
 
-4. **[Doxygen](https://www.doxygen.nl/download.html)**: Standard installation.
+Alternatively, you can follow the rest to install all required packages:
 
-5. **[Graphviz](https://graphviz.org/download/)**: Make sure you choose the
+6. **[Doxygen](https://www.doxygen.nl/download.html)**: Standard installation.
+
+7. **[Graphviz](https://graphviz.org/download/)**: Make sure you choose the
 option to add this to the Path.
 
-6. **[LLVM](https://releases.llvm.org/download.html)**: There are many options.
-For my Windows VM on Apple Silicon, I chose `LLVM-18.1.8-woa64.exe`. This package
-installs `llvm-cov`, `clang-format` and Clang compilers. Make sure you select the
-option to add it to the Path. On Windows coverage reports are available only with
-`windows-clang-debug` preset.
+8. **[LLVM](https://github.com/llvm/llvm-project/releases/)**: There are many
+items. For my Windows VM on Apple Silicon, I chose `LLVM-18.1.8-woa64.exe`.
+This package installs `llvm-cov`, `clang-format` and Clang compilers. Make sure
+you select the option to add it to the Path. On Windows coverage reports are
+available only with `windows-clang-debug` preset.
 
 To generate coverage reports on Windows:
 
@@ -283,12 +312,15 @@ python3 -m http.server 8172
 
 <p align="center"><img src="https://i.postimg.cc/pyMHjh1R/temp-Image-Pk-EGql.avif" alt="Coverage"></img></p>
 
-7. **[Cppcheck](https://cppcheck.sourceforge.io/)**: Standard installation.
+9. **[Cppcheck](https://cppcheck.sourceforge.io/)**: Standard installation.
 
-8. **[NSIS](https://nsis.sourceforge.io/Download)**: Standard installation.
+10. **[NSIS](https://nsis.sourceforge.io/Download)**: Standard installation.
 
-9. **[Ninja](https://ninja-build.org/)**: Copy the executable to
-`C:/Program Files/ninja/`.
+11. **[Ninja](https://ninja-build.org/)**: If you already have Qt installed, you
+probably have the executable at `C:/Qt/Tools/Ninja`. In that case, change the
+`CMAKE_MAKE_PROGRAM` in `CMakePresets.json` from `C:/Program Files/ninja/ninja`
+to the one provided by Qt. If Qt is not installed, or it was installed without
+Ninja, copy the downloaded executable to `C:/Program Files/ninja/`.
 
 ## Setting Up Mac
 
