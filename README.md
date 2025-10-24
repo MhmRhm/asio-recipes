@@ -225,6 +225,7 @@ Examples:
 
 2. **Memory Check Report**:
    ```bash
+   ulimit -n 65536
    cmake --build --preset linux-default-debug --target memcheck-google_test_libsee
    cd ../SeeMake-build-linux-default-debug/valgrind-google_test_libsee/
    python3 -m http.server 8172
