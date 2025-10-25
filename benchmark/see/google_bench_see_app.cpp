@@ -1,11 +1,11 @@
 #include "benchmark/benchmark.h"
-#include "see/terminal_see.h"
+#include "see/see_app.h"
 
-static void BM_Terminal_See(benchmark::State &state) {
+static void BM_see_App(benchmark::State &state) {
   std::cout.setstate(std::ios_base::failbit);
   for (auto _ : state) {
-    terminalSee();
+    seeApp();
   }
   std::cout.clear();
 }
-BENCHMARK(BM_Terminal_See);
+BENCHMARK(BM_see_App);

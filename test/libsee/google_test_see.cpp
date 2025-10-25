@@ -1,7 +1,7 @@
-#include "libsee/see_model.h"
+#include "libsee/see.h"
 #include "gtest/gtest.h"
 
-TEST(See_Model_Tests, Test_Get_Version) {
+TEST(see_Tests, Test_Get_Version) {
   // given
   std::string msg{};
 

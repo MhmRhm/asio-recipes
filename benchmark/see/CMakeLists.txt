@@ -1,11 +1,11 @@
-add_executable(google_bench_see
-	google_bench_terminal_see.cpp
+add_executable(google_bench_see_app
+	google_bench_see_app.cpp
 )
 
-target_link_libraries(google_bench_see
+target_link_libraries(google_bench_see_app
 	PRIVATE precompiled
-	PRIVATE terminal_see_static
+	PRIVATE see_app_static
 )
 
-Format(google_bench_see .)
-AddBenchmarks(google_bench_see)
+Format(google_bench_see_app .)
+AddBenchmarks(google_bench_see_app)

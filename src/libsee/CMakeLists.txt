@@ -1,5 +1,5 @@
 add_library(libsee_obj OBJECT
-	see_model.cpp
+	see.cpp
 )
 
 target_compile_options(libsee_obj
@@ -13,7 +13,7 @@ target_include_directories(libsee_obj
 )
 
 set_target_properties(libsee_obj PROPERTIES
-	PUBLIC_HEADER src/libsee/include/libsee/see_model.h
+	PUBLIC_HEADER src/libsee/include/libsee/see.h
 	POSITION_INDEPENDENT_CODE 1
 )
 

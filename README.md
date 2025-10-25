@@ -73,6 +73,12 @@ manage dependencies. For large repositories such as Boost, the setup process may
 take some time, but you'll get library versions that are often many releases
 ahead of what system package managers provide.
 
+Generating test coverage reports requires debug symbols, so coverage targets
+won't build for Release configurations.
+
+Keep in mind that on Windows, file paths cannot exceed 260 characters. To prevent
+issues, use short folder names and **avoid spaces in directory or file names**.
+
 All necessary path variables used by this template are configured in the
 `CMakePresets.json` file. If your local installation paths for dependencies like
 vcpkg or Qt differ from the defaults, modify the entries in this file
@@ -118,12 +124,6 @@ export LD_LIBRARY_PATH="/home/<username>/Qt/6.9.3/gcc_arm64/bin:$LD_LIBRARY_PATH
 ```powershell
 $Env:Path += ";C:\Qt\6.9.3\msvc2022_arm64\lib;C:\Qt\6.9.3\msvc2022_arm64\bin"
 ```
-
-Generating test coverage reports requires debug symbols, so coverage targets
-won't build for Release configurations.
-
-Keep in mind that on Windows, file paths cannot exceed 260 characters. To prevent
-issues, use short folder names and avoid spaces in directory or file names.
 
 One last thing, I've encountered a situation on Windows where having Strawberry
 Perl installed can interfere with or disable Cppcheck. Just something to keep in
@@ -216,34 +216,37 @@ Examples:
 
 1. **Documentation**:
    ```bash
+   cmake --preset linux-default-debug
    cmake --build --preset linux-default-debug --target doxygen-libsee_static
    cd ../SeeMake-build-linux-default-debug/doxygen-libsee_static/
    python3 -m http.server 8172
    # Go to localhost:8172 in your browser to view the documentation
    ```
 
-<p align="center"><img src="https://i.postimg.cc/rsvX50sQ/temp-Image-T6-RQPP.avif" alt="Documentation"></img></p>
+<p align="center"><img src="https://i.postimg.cc/yNDzJxdZ/temp-Imageftu3t-A.avif" alt="Documentation"></img></p>
 
 2. **Memory Check Report**:
    ```bash
    ulimit -n 65536
+   cmake --preset linux-default-debug
    cmake --build --preset linux-default-debug --target memcheck-google_test_libsee
    cd ../SeeMake-build-linux-default-debug/valgrind-google_test_libsee/
    python3 -m http.server 8172
    # Go to localhost:8172 to view the test results
    ```
 
-<p align="center"><img src="https://i.postimg.cc/MZ48C45V/temp-Imageg-Xd-Bd-Z.avif" alt="Valgrind"></img></p>
+<p align="center"><img src="https://i.postimg.cc/JzFsRRbm/temp-Image-V6MDoy.avif" alt="Valgrind"></img></p>
 
 3. **Coverage Report**:
    ```bash
+   cmake --preset linux-default-debug
    cmake --build --preset linux-default-debug --target coverage-google_test_libsee
    cd ../SeeMake-build-linux-default-debug/coverage-google_test_libsee/
    python3 -m http.server 8172
    # Go to localhost:8172 to view the test coverage report
    ```
 
-<p align="center"><img src="https://i.postimg.cc/kGVPVFJ2/temp-Image-GHm5hw.avif" alt="Coverage"></img></p>
+<p align="center"><img src="https://i.postimg.cc/ydMhxF9L/temp-Image-HDo-D1i.avif" alt="Coverage"></img></p>
 
 ## Setting Up Windows
 
@@ -306,13 +309,14 @@ available only with `windows-clang-debug` preset.
 To generate coverage reports on Windows:
 
 ```bash
+cmake --preset windows-clang-debug
 cmake --build --preset windows-clang-debug --target coverage-google_test_libsee
 cd ../SeeMake-build-windows-clang-debug/coverage-google_test_libsee/
 python3 -m http.server 8172
 # Go to localhost:8172 to view the test coverage report
 ```
 
-<p align="center"><img src="https://i.postimg.cc/pyMHjh1R/temp-Image-Pk-EGql.avif" alt="Coverage"></img></p>
+<p align="center"><img src="https://i.postimg.cc/L5vb1CT2/temp-Imagem-YQb-Xr.avif" alt="Coverage"></img></p>
 
 9. **[Cppcheck](https://cppcheck.sourceforge.io/)**: Standard installation.
 
@@ -458,7 +462,7 @@ In their `main.cpp`, they might write:
 
 #include <iostream>
 #include <format>
-#include "libsee/see_model.h"
+#include "libsee/see.h"
 
 int main() {
   std::cout << getVersion() << std::endl;

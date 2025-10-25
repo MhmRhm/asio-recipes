@@ -1,5 +1,5 @@
 add_executable(google_test_libsee
-	google_test_see_model.cpp
+	google_test_see.cpp
 )
 
 target_link_libraries(google_test_libsee

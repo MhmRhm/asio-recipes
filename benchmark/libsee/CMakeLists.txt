@@ -1,5 +1,5 @@
 add_executable(google_bench_libsee
-	google_bench_see_model.cpp
+	google_bench_see.cpp
 )
 
 target_link_libraries(google_bench_libsee

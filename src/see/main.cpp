@@ -1,4 +1,4 @@
-#include "see/terminal_see.h"
+#include "see/see_app.h"
 
 /**
  * @brief Entry point of the program
@@ -6,6 +6,6 @@
  * @return int
  */
 int main() {
-  terminalSee();
+  seeApp();
   return 0;
 }

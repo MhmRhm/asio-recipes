@@ -1,4 +1,4 @@
-#include "libsee/see_model.h"
+#include "libsee/see.h"
 #include "buildinfo/buildinfo.h"
 
 std::string getVersion() {
