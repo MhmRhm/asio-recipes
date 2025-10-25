@@ -4,7 +4,7 @@ A feature-packed, ready-to-use, cross-platform CMake template with testing,
 static and dynamic checks, coverage reports, and more.
 
 This template comes with a [tutorial](https://mhmrhm.github.io/tutorials/posts/see-make/)
-and a [working example](https://github.com/MhmRhm/FTowerX), so be sure to read on.
+and some working examples, so be sure to read on.
 
 1. [Included Features](#included-eatures)
 2. [Notes Before You Begin](#notes-before-you-begin)
@@ -52,15 +52,16 @@ by Rafał Świdziński, which is licensed under the MIT license. It is one of th
 most useful books I have read.
 
 For those using this template who want a deeper understanding, I've provided a
-tutorial on this template at
-[DotBashHistory](https://mhmrhm.github.io/tutorials/posts/see-make/).
+tutorial on this template at [DotBashHistory](https://mhmrhm.github.io/tutorials/posts/see-make/).
 I highly recommend that you review the tutorial or at least examine each file in
 this template to understand them. You will likely need to modify these files at
 some point.
 
-I also have another project that implements the Model-View-Controller (MVC)
-design pattern, using this template as a foundation. You can check it out in
-action [here](https://github.com/MhmRhm/FTowerX).
+One of the examples built with this template is a terminal-based Tower of Hanoi
+game that follows the Model–View–Controller (MVC) design pattern. You can see it
+in action [here](https://github.com/MhmRhm/FTowerX). Another example, showcasing
+a collection of practical recipes for Boost.Asio and Google Protobuf, is
+available [here](https://github.com/MhmRhm/asio-recipes).
 
 ## Notes Before You Begin
 
@@ -79,10 +80,10 @@ accordingly. For instance, when developing on Windows and using the Clang Releas
 preset, locate the preset in the `.json` file and update its `cacheVariables`
 section to reflect your environment.
 
-If you're developing Qt applications in a terminal-based environment such as
-VS Code, running an executable that depends on Qt libraries may fail. This
-typically happens because the executable cannot locate the required Qt libraries
-at runtime.
+If you're developing Qt applications in an environment other than Qt Creator,
+running an executable that depends on Qt libraries may fail. This typically
+happens because the executable cannot locate the required Qt libraries at
+runtime.
 
 There are several ways to resolve this issue:
 
@@ -96,9 +97,9 @@ There are several ways to resolve this issue:
    terminal, then run your executable from that terminal session.
 
 3. **Use the Qt deployment tool (Windows):**
-   Run the *windeployqt* tool located at `C:\Qt\6.9.3\msvc2022_arm64\bin\windeployqt6.exe`
-   and provide the path to your executable. This will copy the required Qt
-   libraries next to your binary.
+   Run the *windeployqt* tool located at for example `C:\Qt\6.9.3\msvc2022_arm64\bin\windeployqt6.exe`
+   and provide it with the path to your executable. This will copy the required
+   Qt libraries next to your binary.
 
 If you’re using Qt Creator, the IDE automatically configures the necessary
 environment variables, so no manual setup is needed.
@@ -167,7 +168,7 @@ git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg && ./bootstrap-vcpkg.sh
 ```
 
-At this point, you can proceed with a trial-and-error approach. This template
+At this point, you may proceed with a trial-and-error approach. This template
 includes a `CMakePresets.json` file with predefined workflows. To get started,
 run the following command and review the output. If any packages are missing,
 install them, clean the build directory, and try again.
@@ -179,7 +180,7 @@ cmake --build --preset linux-default-release --target clean
 ```
 
 Alternatively, you can run the following commands to install the remaining
-required packages:
+required packages all at once:
 
 ```bash
 sudo apt-get -y install doxygen graphviz mscgen dia
@@ -386,6 +387,43 @@ cmake --workflow --list-presets
 cmake --workflow --preset linux-default-release
 ```
 
+This repository contains two branches. In addition to the `main` branch, there
+is a helper branch designed to make it easier to adapt this template for your
+own project. All files, folders, and CMake targets in the template include the
+keyword `see` in their names. The helper branch automates the process of
+renaming these items—files, directories, and internal references—to match your
+chosen project name.
+
+Run `git show -s origin/rename-project` and see the commit message which
+explains how to use this feature:
+
+```
+Generalize project by renaming all references from `See` to a new project name
+
+This branch is used to generate a patch that can be applied to the main branch.
+Before applying the patch, every occurrence of `ProjectName` is replaced with
+a chosen project name. This approach automatically updates all file names,
+folder names, and build targets with minimal effort.
+
+Example workflow in a Bash terminal:
+
+  git checkout rename-project
+  git format-patch main --stdout > projectname.patch
+  sed -i "s/ProjectName/<new-project-name>/g" projectname.patch
+  git checkout main
+  git apply projectname.patch
+  rm projectname.patch
+
+To restart the process from scratch:
+
+  git restore .
+  git clean -xdff
+
+Note: This template defines two major targets — a library and an executable
+that links to it. For example, if you choose `computation` as the new project
+name, the resulting targets will be `libcomputation` and `computation_app`.
+```
+
 ## First Step
 
 One man's final step is another man's first step. After developing your
@@ -437,5 +475,6 @@ cmake --workflow --preset linux-default-release
 This template works well with the recommended extensions for C++ development in
 VSCode, so be sure to check them out.
 
-This template is tested on both Linux and Windows. I hope you find this useful.
-Please feel free to reach out if you have any improvements or suggestions.
+This template is tested on Linux, Windows and to some extend on Mac OS. I hope
+you find this useful. Please feel free to reach out if you have any improvements
+or suggestions.
