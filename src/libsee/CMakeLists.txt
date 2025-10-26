@@ -35,7 +35,7 @@ set_target_properties(libsee_static PROPERTIES
 	OUTPUT_NAME "see$<$<CONFIG:Debug>:d>"
 )
 
-BuildInfo(libsee_obj)
+AddBuildInfo(libsee_obj)
 CleanCoverage(libsee_static)
 Format(libsee_static .)
 AddCppcheck(libsee_static)

@@ -60,6 +60,6 @@ configure_file(
 	"${DESTINATION}/buildinfo/buildinfo.h" @ONLY
 )
 
-function(BuildInfo target)
+function(AddBuildInfo target)
 	target_include_directories(${target} PRIVATE ${DESTINATION})
 endfunction()

@@ -1,5 +1,6 @@
 {
     "dependencies": [
+        "pkgconf",
         "boost",
         "protobuf",
         "benchmark",

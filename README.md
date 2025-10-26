@@ -101,6 +101,9 @@ There are several ways to resolve this issue:
 2. **Set environment variables manually:**
    Add the required Qt library paths to your environment variables in the
    terminal, then run your executable from that terminal session.
+   If you’re using VS Code and have the CMake Tools extension installed, you can
+   configure these variables directly in the editor. Open the VS Code settings,
+   search for `cmake.environment`, and add the necessary paths there.
 
 3. **Use the Qt deployment tool (Windows):**
    Run the *windeployqt* tool located at for example `C:\Qt\6.9.3\msvc2022_arm64\bin\windeployqt6.exe`

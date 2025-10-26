@@ -11,7 +11,7 @@ target_link_libraries(see_app_static
 	PUBLIC libsee_static
 )
 
-BuildInfo(see_app_static)
+AddBuildInfo(see_app_static)
 CleanCoverage(see_app_static)
 Format(see_app_static .)
 AddCppcheck(see_app_static)
