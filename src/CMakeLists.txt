@@ -1,5 +1,3 @@
-# add_subdirectory(libsee)
-# add_subdirectory(see)
 add_subdirectory(asio1)
 add_subdirectory(asio2)
 add_subdirectory(asio3)
