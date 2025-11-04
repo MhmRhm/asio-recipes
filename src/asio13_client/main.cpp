@@ -16,7 +16,7 @@ using namespace std::chrono_literals;
 void check_op(boost::system::error_code ec, std::size_t rec_len,
               std::size_t exp_len) {
   if (ec.value())
-    throw boost::system::system_error(ec, ec.message());
+    throw boost::system::system_error(ec);
   if (rec_len != exp_len)
     throw boost::system::system_error(
         boost::asio::error::operation_aborted,
