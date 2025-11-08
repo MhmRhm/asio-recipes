@@ -3,6 +3,7 @@
         "pkgconf",
         "boost",
         "protobuf",
+        "openssl",
         "benchmark",
         "gtest",
         "ftxui"
