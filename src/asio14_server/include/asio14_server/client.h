@@ -9,7 +9,7 @@ private:
   int m_id{};
   size_t m_dataLen{};
   boost::asio::mutable_buffer m_lenBuf{};
-  boost::asio::streambuf m_dataBuf{};
+  boost::asio::streambuf m_dataBuf{1 << 20}; // 1 MB buffer
   boost::asio::ip::tcp::socket m_socket;
   std::function<void(boost::asio::streambuf &)> m_communicateHandler{};
   std::function<void(int)> m_disconnectHandler{};
