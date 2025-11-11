@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package myapp;
+
+message WorkRequest {
+	int32 job_id = 1;
+	int32 workload = 2;
+}
+
+message WorkResponse {
+	int32 job_id = 1;
+	bool is_complete = 2;
+}
+
+message WorkMessage {
+	oneof payload {
+		WorkRequest work_request = 1;
+		WorkResponse work_response = 2;
+	}
+}
