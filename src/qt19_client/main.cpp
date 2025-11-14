@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   QCoreApplication app(argc, argv);
   Client client{};
 
-  QObject::connect(&client, &Client::resposeReceived, [&]() {
+  QObject::connect(&client, &Client::responseReceived, [&]() {
     myapp::WorkMessage response_message{};
     response_message.ParseFromArray(
         client.dataBuffer().data(),

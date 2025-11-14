@@ -15,7 +15,7 @@ private:
   std::function<void(int, boost::asio::streambuf &)> m_onRequest{};
 
 public:
-  Server(boost::asio::io_context &ioContext, unsigned short port,
+  Server(boost::asio::io_context &ioContext, uint16_t port,
          std::function<void(int, boost::asio::streambuf &)> onRequest);
   virtual ~Server() = default;
 

@@ -5,14 +5,13 @@
 
 class Client : public QObject {
   Q_OBJECT
-
 private:
   QTcpSocket m_socket{};
   QByteArray m_dataBuf{};
   uint64_t m_dataLen{};
 
 signals:
-  void resposeReceived();
+  void responseReceived();
 
 public:
   Client(QObject *parent = nullptr);
@@ -24,7 +23,7 @@ public:
   QByteArray &dataBuffer() { return m_dataBuf; }
 
 public slots:
-  bool sendRequest();
+  void sendRequest();
 
 private slots:
   void receiveResponse();
