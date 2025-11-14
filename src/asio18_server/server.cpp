@@ -3,17 +3,16 @@
 
 using namespace boost::asio;
 
-Server::Server(
-    boost::asio::io_context &ioContext, unsigned short port,
-    std::function<void(boost::asio::streambuf &)> communicationHandler)
+Server::Server(boost::asio::io_context &ioContext, unsigned short port,
+               std::function<void(int, boost::asio::streambuf &)> onRequest)
     : m_ioContext{ioContext},
       m_acceptor{m_ioContext, boost::asio::ip::tcp::endpoint(
                                   boost::asio::ip::tcp::v4(), port)},
-      m_communicationHandler{communicationHandler} {
+      m_onRequest{onRequest} {
   initiateAccept();
 }
 
-void Server::onDisconnected(int clientId) {
+void Server::onDisconnect(int clientId) {
   std::cout << std::format("Client with id {} disconnected.\n", clientId);
   m_clients.erase(clientId);
 }
@@ -22,7 +21,7 @@ void Server::initiateAccept() {
   Client &client{
       (m_clients
            .try_emplace(m_clientIdCounter, m_ioContext, m_clientIdCounter,
-                        [this](int id) { onDisconnected(id); })
+                        [this](int id) { onDisconnect(id); })
            .first->second)};
   m_clientIdCounter += 1;
   m_acceptor.async_accept(
@@ -33,6 +32,6 @@ void Server::initiateAccept() {
           throw boost::system::system_error(ec);
         }
         initiateAccept();
-        client.initiateCommunication(m_communicationHandler);
+        client.initiateCommunication(m_onRequest);
       });
 }

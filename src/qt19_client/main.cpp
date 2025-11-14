@@ -1,24 +1,43 @@
 #include <format>
 #include <iostream>
 
-#include "qt19_client/client.h"
-#include "qt19_client_pb/WorkLoad.pb.h"
+#include <QCoreApplication>
+#include <QSocketNotifier>
 
 #include <google/protobuf/util/json_util.h>
+
+#include "qt19_client/client.h"
+#include "qt19_client_pb/WorkLoad.pb.h"
 
 using namespace std;
 using namespace google::protobuf::util;
 
-int main() {
-  bool is_disconnected{};
+int main(int argc, char *argv[]) {
+  QCoreApplication app(argc, argv);
   Client client{};
 
-  uint32_t load{};
-  uint32_t id{};
-  while (!is_disconnected && std::cin >> load) {
-    if (load == static_cast<uint32_t>(-1)) {
-      is_disconnected = true;
-      continue;
+  QObject::connect(&client, &Client::resposeReceived, [&]() {
+    myapp::WorkMessage response_message{};
+    response_message.ParseFromArray(
+        client.dataBuffer().data(),
+        static_cast<int>(client.dataBuffer().size()));
+
+    std::string json{};
+    auto status = MessageToJsonString(response_message, &json,
+                                      JsonPrintOptions{.add_whitespace = true});
+    if (status.ok()) {
+      std::cout << "Received response message: " << json << std::endl;
+    } else {
+      std::cerr << "Failed to convert response message to JSON." << std::endl;
+    }
+  });
+
+  uint32_t id{}, load{};
+  QSocketNotifier stdinNotifier{fileno(stdin), QSocketNotifier::Read};
+  QObject::connect(&stdinNotifier, &QSocketNotifier::activated, [&]() {
+    if (!(std::cin >> load)) {
+      app.quit();
+      return;
     }
 
     if (!client.isConnected()) {
@@ -33,21 +52,8 @@ int main() {
     message.SerializeToArray(client.dataBuffer().data(),
                              static_cast<int>(client.dataBuffer().size()));
 
-    client.initiateCommunication([&](QByteArray &buffer) {
-      myapp::WorkMessage response_message{};
-      response_message.ParseFromArray(buffer.data(),
-                                      static_cast<int>(buffer.size()));
+    client.sendRequest();
+  });
 
-      std::string json{};
-      auto status = MessageToJsonString(
-          response_message, &json, JsonPrintOptions{.add_whitespace = true});
-      if (status.ok()) {
-        std::cout << "Received response message: " << json << std::endl;
-      } else {
-        std::cerr << "Failed to convert response message to JSON." << std::endl;
-      }
-    });
-  }
-
-  return 0;
+  return app.exec();
 }

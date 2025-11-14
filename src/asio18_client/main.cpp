@@ -16,7 +16,7 @@ void printError(const boost::system::error_code &ec) {
 }
 
 int main() {
-  bool is_disconnected{};
+  std::atomic_bool is_disconnected{};
   io_context io_context;
   auto work_guard{make_work_guard(io_context)};
   Client client{io_context, [&]() {
@@ -38,12 +38,11 @@ int main() {
     }
   }};
 
-  uint32_t load{};
-  uint32_t id{};
-  while (!is_disconnected && std::cin >> load) {
-    if (load == static_cast<uint32_t>(-1)) {
+  uint32_t load{}, id{};
+  while (true) {
+    if (!(std::cin >> load)) {
       is_disconnected = true;
-      continue;
+      break;
     }
 
     if (!client.isConnected()) {

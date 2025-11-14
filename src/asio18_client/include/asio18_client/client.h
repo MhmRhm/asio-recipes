@@ -7,7 +7,7 @@
 
 class Client {
 private:
-  size_t m_dataLen{};
+  uint64_t m_dataLen{};
   boost::asio::mutable_buffer m_lenBuf{};
   boost::asio::streambuf m_dataBuf{};
   boost::asio::ip::tcp::socket m_socket;
