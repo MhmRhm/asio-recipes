@@ -17,7 +17,7 @@ void printError(const boost::system::error_code &ec) {
 
 void onRequest(int clientID, boost::asio::streambuf &dataBuf) {
   std::istream is(&dataBuf);
-  myapp::WorkMessage requestMsg;
+  myapp::WorkMessage requestMsg{};
   requestMsg.ParseFromIstream(&is);
 
   std::string json{};
@@ -34,7 +34,7 @@ void onRequest(int clientID, boost::asio::streambuf &dataBuf) {
       std::chrono::milliseconds(requestMsg.work_request().workload()));
 
   std::ostream os(&dataBuf);
-  myapp::WorkMessage responseMsg;
+  myapp::WorkMessage responseMsg{};
   responseMsg.mutable_work_response()->set_job_id(
       requestMsg.work_request().job_id());
   responseMsg.mutable_work_response()->set_is_complete(true);

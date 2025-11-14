@@ -3,7 +3,7 @@
 
 using namespace boost::asio;
 
-Server::Server(boost::asio::io_context &ioContext, unsigned short port,
+Server::Server(boost::asio::io_context &ioContext, uint16_t port,
                std::function<void(int, boost::asio::streambuf &)> onRequest)
     : m_ioContext{ioContext},
       m_acceptor{m_ioContext, boost::asio::ip::tcp::endpoint(

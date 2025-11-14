@@ -24,16 +24,16 @@ bool Client::connectToHost(const QString &host, uint16_t port) {
   return m_socket.waitForConnected(5000);
 }
 
-bool Client::sendRequest() {
+void Client::sendRequest() {
   m_dataLen = m_dataBuf.size();
   if (m_socket.write(reinterpret_cast<const char *>(&m_dataLen),
                      sizeof(m_dataLen)) == -1)
-    return false;
+    return;
   if (m_socket.write(m_dataBuf) == -1)
-    return false;
+    return;
   m_socket.flush();
   m_dataLen = 0;
-  return true;
+  return;
 }
 
 void Client::receiveResponse() {
@@ -47,5 +47,5 @@ void Client::receiveResponse() {
   m_socket.read(m_dataBuf.data(), m_dataLen);
   m_dataLen = 0;
 
-  emit resposeReceived();
+  emit responseReceived();
 }
