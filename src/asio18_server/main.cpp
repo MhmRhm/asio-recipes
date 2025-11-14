@@ -15,10 +15,20 @@ void printError(const boost::system::error_code &ec) {
                            ec.what());
 }
 
-void communicationHandler(boost::asio::streambuf &dataBuf) {
+void onRequest(int clientID, boost::asio::streambuf &dataBuf) {
   std::istream is(&dataBuf);
   myapp::WorkMessage requestMsg;
   requestMsg.ParseFromIstream(&is);
+
+  std::string json{};
+  auto status = MessageToJsonString(requestMsg, &json,
+                                    JsonPrintOptions{.add_whitespace = true});
+  if (status.ok()) {
+    std::cout << std::format("Received request message from client {}:\n{}\n",
+                             clientID, json);
+  } else {
+    std::cerr << "Failed to convert request message to JSON." << std::endl;
+  }
 
   std::this_thread::sleep_for(
       std::chrono::milliseconds(requestMsg.work_request().workload()));
@@ -34,30 +44,30 @@ void communicationHandler(boost::asio::streambuf &dataBuf) {
 int main() {
   std::atomic_bool isRunning{true};
 
-  io_context io_context{};
-  auto work_guard{make_work_guard(io_context)};
+  io_context ioContext{};
+  auto workGuard{make_work_guard(ioContext)};
   std::vector<std::thread> threadPool{};
   // for (size_t i{}; i < 1; i += 1) {
   for (size_t i{}; i < std::thread::hardware_concurrency(); i += 1) {
     threadPool.emplace_back([&]() {
       while (isRunning) {
         try {
-          io_context.run();
+          ioContext.run();
         } catch (const boost::system::system_error &e) {
           printError(e.code());
         }
       }
     });
   }
-  Server server{io_context, 8172, communicationHandler};
+  Server server{ioContext, 8172, onRequest};
 
   std::string line{};
   while (std::cin >> line)
     ;
 
   isRunning = false;
-  work_guard.reset();
-  io_context.stop();
+  workGuard.reset();
+  ioContext.stop();
   for (auto &t : threadPool) {
     t.join();
   }

@@ -7,25 +7,24 @@
 class Client {
 private:
   int m_id{};
-  size_t m_dataLen{};
+  uint64_t m_dataLen{};
   boost::asio::mutable_buffer m_lenBuf{};
   boost::asio::streambuf m_dataBuf{1 << 20}; // 1 MB buffer
   boost::asio::ip::tcp::socket m_socket;
-  std::function<void(boost::asio::streambuf &)> m_communicateHandler{};
-  std::function<void(int)> m_disconnectHandler{};
+  std::function<void(int, boost::asio::streambuf &)> m_onRequest{};
+  std::function<void(int)> m_onDisconnect{};
 
 public:
   Client(boost::asio::io_context &io_context, int id,
-         std::function<void(int)> disconnectHandler)
-      : m_id{id}, m_socket{io_context}, m_disconnectHandler{disconnectHandler} {
-  }
+         std::function<void(int)> onDisconnect)
+      : m_id{id}, m_socket{io_context}, m_onDisconnect{onDisconnect} {}
   virtual ~Client() = default;
 
   int id() const { return m_id; }
   boost::asio::streambuf &dataBuffer() { return m_dataBuf; }
   boost::asio::ip::tcp::socket &socket() { return m_socket; }
   void initiateCommunication(
-      std::function<void(boost::asio::streambuf &)> communicationHandler);
+      std::function<void(int, boost::asio::streambuf &)> onRequest);
 
 private:
   bool checkOperation(const boost::system::error_code &ec,

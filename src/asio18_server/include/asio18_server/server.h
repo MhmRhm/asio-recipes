@@ -7,25 +7,21 @@
 
 class Server {
 private:
-  size_t m_dataLen{};
-  boost::asio::mutable_buffer m_lenBuf{};
-  boost::asio::streambuf m_dataBuf{};
-
   boost::asio::io_context &m_ioContext;
   boost::asio::ip::tcp::acceptor m_acceptor;
 
   int m_clientIdCounter{0};
   std::unordered_map<int, Client> m_clients{};
-  std::function<void(boost::asio::streambuf &)> m_communicationHandler{};
+  std::function<void(int, boost::asio::streambuf &)> m_onRequest{};
 
 public:
   Server(boost::asio::io_context &ioContext, unsigned short port,
-         std::function<void(boost::asio::streambuf &)> communicationHandler);
+         std::function<void(int, boost::asio::streambuf &)> onRequest);
   virtual ~Server() = default;
 
 private:
   void checkOperation(const boost::system::error_code &ec,
                       size_t bytes_transferred, size_t expected_length);
-  void onDisconnected(int clientId);
+  void onDisconnect(int clientId);
   void initiateAccept();
 };

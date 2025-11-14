@@ -5,15 +5,15 @@ using namespace boost::asio;
 bool Client::checkOperation(const boost::system::error_code &ec,
                             size_t bytes_transferred, size_t expected_length) {
   if (ec || bytes_transferred != expected_length) {
-    m_disconnectHandler(m_id);
+    m_onDisconnect(m_id);
     return false;
   }
   return true;
 }
 
 void Client::initiateCommunication(
-    std::function<void(boost::asio::streambuf &)> communicationHandler) {
-  m_communicateHandler = communicationHandler;
+    std::function<void(int, boost::asio::streambuf &)> onRequest) {
+  m_onRequest = onRequest;
   initiateReceiveRequest();
 }
 
@@ -41,7 +41,7 @@ void Client::onLenReceived() {
 }
 
 void Client::onDataReceived() {
-  m_communicateHandler(m_dataBuf);
+  m_onRequest(m_id, m_dataBuf);
   initiateSendResponse();
 }
 
