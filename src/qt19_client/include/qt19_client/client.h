@@ -2,11 +2,13 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QTimer>
 
 class Client : public QObject {
   Q_OBJECT
 private:
   QTcpSocket m_socket{};
+  QTimer m_timeoutTimer{};
   QByteArray m_dataBuf{};
   uint64_t m_dataLen{};
 
@@ -27,4 +29,5 @@ public slots:
 
 private slots:
   void receiveResponse();
+  void onTimeout();
 };
