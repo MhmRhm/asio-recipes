@@ -1,4 +1,4 @@
-#include "qt20_server/server.h"
+#include "qt19_server/server.h"
 
 #include <format>
 #include <iostream>
@@ -7,7 +7,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
-#include "qt20_server/client.h"
+#include "qt19_server/client.h"
 
 Server::Server(uint16_t port, QObject *parent,
                std::function<void(qintptr, QByteArray &)> onRequest)

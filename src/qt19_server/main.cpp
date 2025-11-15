@@ -8,21 +8,14 @@
 
 #include <google/protobuf/util/json_util.h>
 
-#include "qt20_server/server.h"
-#include "qt20_server_pb/WorkLoad.pb.h"
+#include "qt19_server/server.h"
+#include "qt19_server_pb/WorkLoad.pb.h"
 
 using namespace std;
 using namespace google::protobuf::util;
 
-void onRequest(qintptr socketDescriptor, QByteArray &dataBuf) {
-  std::cout << std::format("Handling request from client {} in thread {}.",
-                           socketDescriptor, QThread::currentThreadId())
-            << std::endl;
-
-  myapp::WorkMessage requestMsg{};
-  requestMsg.ParseFromArray(dataBuf.constData(),
-                            static_cast<int>(dataBuf.size()));
-
+void printMessage(qintptr socketDescriptor,
+                  const myapp::WorkMessage &requestMsg) {
   std::string json{};
   auto status = MessageToJsonString(requestMsg, &json,
                                     JsonPrintOptions{.add_whitespace = true});
@@ -32,6 +25,17 @@ void onRequest(qintptr socketDescriptor, QByteArray &dataBuf) {
   } else {
     std::cerr << "Failed to convert request message to JSON." << std::endl;
   }
+}
+
+void onRequest(qintptr socketDescriptor, QByteArray &dataBuf) {
+  std::cout << std::format("Handling request from client {} in thread {}.",
+                           socketDescriptor, QThread::currentThreadId())
+            << std::endl;
+
+  myapp::WorkMessage requestMsg{};
+  requestMsg.ParseFromArray(dataBuf.constData(),
+                            static_cast<int>(dataBuf.size()));
+  printMessage(socketDescriptor, requestMsg);
 
   std::this_thread::sleep_for(
       std::chrono::milliseconds(requestMsg.work_request().workload()));
