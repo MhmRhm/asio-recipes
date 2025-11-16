@@ -6,37 +6,36 @@
 #include <QCoreApplication>
 #include <QSocketNotifier>
 #include <QThread>
+#include <QThreadPool>
 
 #include <google/protobuf/util/json_util.h>
 
-#include "qt19_server/server.h"
-#include "qt19_server_pb/WorkLoad.pb.h"
+#include "qt20_server/server.h"
+#include "qt20_server_pb/WorkLoad.pb.h"
 
 using namespace std;
 using namespace google::protobuf::util;
 
-void printMessage(qintptr socketDescriptor,
-                  const myapp::WorkMessage &requestMsg) {
+void printMessage(const myapp::WorkMessage &requestMsg) {
   std::string json{};
   auto status = MessageToJsonString(requestMsg, &json,
                                     JsonPrintOptions{.add_whitespace = true});
   if (status.ok()) {
-    std::cout << std::format("Received request message from client {}:\n{}\n",
-                             socketDescriptor, json);
+    std::cout << std::format("{}", json) << std::endl;
   } else {
     std::cerr << "Failed to convert request message to JSON." << std::endl;
   }
 }
 
 void onRequest(qintptr socketDescriptor, QByteArray &dataBuf) {
-  std::cout << std::format("Handling request from client {} in thread {}.",
-                           socketDescriptor, QThread::currentThreadId())
+  std::cout << std::format("[{}] Handling request from {}.",
+                           QThread::currentThreadId(), socketDescriptor)
             << std::endl;
 
   myapp::WorkMessage requestMsg{};
   requestMsg.ParseFromArray(dataBuf.constData(),
                             static_cast<int>(dataBuf.size()));
-  printMessage(socketDescriptor, requestMsg);
+  printMessage(requestMsg);
 
   std::this_thread::sleep_for(
       std::chrono::milliseconds(requestMsg.work_request().workload()));
@@ -52,21 +51,28 @@ void onRequest(qintptr socketDescriptor, QByteArray &dataBuf) {
 }
 
 int main(int argc, char *argv[]) {
-  std::cout << std::format("Main thread: {}.", QThread::currentThreadId())
+  std::cout << std::format("[{}] Main thread.", QThread::currentThreadId())
             << std::endl;
 
   QCoreApplication app{argc, argv};
+  auto *pool{QThreadPool::globalInstance()};
+  // pool->setMaxThreadCount(1);
+  pool->setMaxThreadCount(QThread::idealThreadCount());
 
-  Server server{8172, &app, onRequest};
-  server.start();
+  Server server{&app, onRequest};
+  server.listen(QHostAddress::Any, 8172);
 
   QSocketNotifier stdinNotifier{fileno(stdin), QSocketNotifier::Read};
   QObject::connect(&stdinNotifier, &QSocketNotifier::activated, [&]() {
     uint32_t tmp{};
     if (!(std::cin >> tmp)) {
+      server.close();
+      server.disconnectClients();
+      pool->waitForDone();
       app.quit();
     }
   });
 
-  return app.exec();
+  auto ret{app.exec()};
+  return ret;
 }

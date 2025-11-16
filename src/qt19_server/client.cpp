@@ -2,7 +2,6 @@
 
 #include <format>
 #include <iostream>
-#include <source_location>
 
 Client::Client(QTcpSocket *socket, QObject *parent,
                std::function<void(qintptr, QByteArray &)> onRequest)
@@ -30,7 +29,7 @@ void Client::run() {
                              static_cast<int>(m_socket->error()),
                              m_socket->errorString().toStdString())
               << std::endl;
-    m_socket->disconnectFromHost();
+    m_socket->close();
   });
   connect(m_socket, &QTcpSocket::readyRead, m_socket,
           [&]() { receiveRequest(); });
