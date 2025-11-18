@@ -27,7 +27,7 @@ void printResponse(myapp::WorkMessage &response_message) {
 }
 
 void sendRequest(Client &client, uint32_t id, uint32_t load,
-                 std::atomic_bool &is_disconnected) {
+                 [[maybe_unused]] std::atomic_bool &is_disconnected) {
   std::ostream os{&client.dataBuffer()};
   myapp::WorkMessage message{};
   myapp::WorkRequest *work_request = message.mutable_work_request();
