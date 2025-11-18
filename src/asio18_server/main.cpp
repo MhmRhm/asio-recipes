@@ -15,11 +15,7 @@ void printError(const boost::system::error_code &ec) {
                            ec.what());
 }
 
-void onRequest(int clientID, boost::asio::streambuf &dataBuf) {
-  std::istream is(&dataBuf);
-  myapp::WorkMessage requestMsg{};
-  requestMsg.ParseFromIstream(&is);
-
+void printMessage(int clientID, const myapp::WorkMessage &requestMsg) {
   std::string json{};
   auto status = MessageToJsonString(requestMsg, &json,
                                     JsonPrintOptions{.add_whitespace = true});
@@ -29,6 +25,13 @@ void onRequest(int clientID, boost::asio::streambuf &dataBuf) {
   } else {
     std::cerr << "Failed to convert request message to JSON." << std::endl;
   }
+}
+
+void onRequest(int clientID, boost::asio::streambuf &dataBuf) {
+  std::istream is(&dataBuf);
+  myapp::WorkMessage requestMsg{};
+  requestMsg.ParseFromIstream(&is);
+  printMessage(clientID, requestMsg);
 
   std::this_thread::sleep_for(
       std::chrono::milliseconds(requestMsg.work_request().workload()));

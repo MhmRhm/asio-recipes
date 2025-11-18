@@ -74,7 +74,7 @@
 				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Od",
 				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "C:/Qt/6.10.0/msvc2022_arm64"
+				"QTDIR": "C:/Qt/6.10.0/msvc2022_64"
 			}
 		},
 		{
@@ -102,7 +102,7 @@
 				"DEFAULT_CXX_OPTIMIZE_FLAG": "/Ox",
 				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "C:/Qt/6.10.0/msvc2022_arm64"
+				"QTDIR": "C:/Qt/6.10.0/msvc2022_64"
 			}
 		},
 		{
@@ -513,18 +513,6 @@
 				{
 					"type": "test",
 					"name": "linux-test-debug"
-				},
-				{
-					"type": "build",
-					"name": "linux-default-debug-coverage"
-				},
-				{
-					"type": "build",
-					"name": "linux-default-debug-memcheck"
-				},
-				{
-					"type": "build",
-					"name": "linux-default-debug-doxygen"
 				}
 			]
 		},
@@ -543,10 +531,6 @@
 				{
 					"type": "test",
 					"name": "linux-test-release"
-				},
-				{
-					"type": "build",
-					"name": "linux-default-release-doxygen"
 				},
 				{
 					"type": "package",
@@ -569,10 +553,6 @@
 				{
 					"type": "test",
 					"name": "windows-test-debug"
-				},
-				{
-					"type": "build",
-					"name": "windows-default-debug-doxygen"
 				}
 			]
 		},
@@ -591,10 +571,6 @@
 				{
 					"type": "test",
 					"name": "windows-test-release"
-				},
-				{
-					"type": "build",
-					"name": "windows-default-release-doxygen"
 				},
 				{
 					"type": "package",
@@ -617,10 +593,6 @@
 				{
 					"type": "test",
 					"name": "windows-x86-test-debug"
-				},
-				{
-					"type": "build",
-					"name": "windows-x86-debug-doxygen"
 				}
 			]
 		},
@@ -639,10 +611,6 @@
 				{
 					"type": "test",
 					"name": "windows-x86-test-release"
-				},
-				{
-					"type": "build",
-					"name": "windows-x86-release-doxygen"
 				},
 				{
 					"type": "package",
@@ -665,14 +633,6 @@
 				{
 					"type": "test",
 					"name": "windows-clang-test-debug"
-				},
-				{
-					"type": "build",
-					"name": "windows-clang-debug-coverage"
-				},
-				{
-					"type": "build",
-					"name": "windows-clang-debug-doxygen"
 				}
 			]
 		},
@@ -691,10 +651,6 @@
 				{
 					"type": "test",
 					"name": "windows-clang-test-release"
-				},
-				{
-					"type": "build",
-					"name": "windows-clang-release-doxygen"
 				},
 				{
 					"type": "package",
@@ -717,14 +673,6 @@
 				{
 					"type": "test",
 					"name": "mac-test-debug"
-				},
-				{
-					"type": "build",
-					"name": "mac-default-debug-coverage"
-				},
-				{
-					"type": "build",
-					"name": "mac-default-debug-doxygen"
 				}
 			]
 		},
@@ -743,10 +691,6 @@
 				{
 					"type": "test",
 					"name": "mac-test-release"
-				},
-				{
-					"type": "build",
-					"name": "mac-default-release-doxygen"
 				},
 				{
 					"type": "package",

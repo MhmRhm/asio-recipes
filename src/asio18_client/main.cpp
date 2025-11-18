@@ -15,13 +15,46 @@ void printError(const boost::system::error_code &ec) {
                            ec.what());
 }
 
+void printResponse(myapp::WorkMessage &response_message) {
+  std::string json{};
+  auto status = MessageToJsonString(response_message, &json,
+                                    JsonPrintOptions{.add_whitespace = true});
+  if (status.ok()) {
+    std::cout << "Received response message: " << json << std::endl;
+  } else {
+    std::cerr << "Failed to convert response message to JSON." << std::endl;
+  }
+}
+
+void sendRequest(Client &client, uint32_t id, uint32_t load,
+                 std::atomic_bool &is_disconnected) {
+  std::ostream os{&client.dataBuffer()};
+  myapp::WorkMessage message{};
+  myapp::WorkRequest *work_request = message.mutable_work_request();
+  work_request->set_job_id(id);
+  work_request->set_workload(load);
+  message.SerializeToOstream(&os);
+
+  client.initiateCommunication([&, new_id = id + 1](streambuf &buffer) {
+    std::istream is{&buffer};
+    myapp::WorkMessage response_message{};
+    response_message.ParseFromIstream(&is);
+    printResponse(response_message);
+
+    // if (!is_disconnected)
+    //   sendRequest(client, new_id, 0, is_disconnected);
+  });
+}
+
 int main() {
   std::atomic_bool is_disconnected{};
+  uint32_t load{}, id{};
   io_context io_context;
   auto work_guard{make_work_guard(io_context)};
   Client client{io_context, [&]() {
                   std::cout << "Disconnected from server." << std::endl;
                 }};
+
   boost::system::error_code ec = client.connect("127.0.0.1", 8172);
   if (ec) {
     printError(ec);
@@ -38,7 +71,8 @@ int main() {
     }
   }};
 
-  uint32_t load{}, id{};
+  // sendRequest(client, id + 1, 0, is_disconnected);
+
   while (true) {
     if (!(std::cin >> load)) {
       is_disconnected = true;
@@ -53,27 +87,7 @@ int main() {
       }
     }
 
-    std::ostream os{&client.dataBuffer()};
-    myapp::WorkMessage message{};
-    myapp::WorkRequest *work_request = message.mutable_work_request();
-    work_request->set_job_id(id += 1);
-    work_request->set_workload(load);
-    message.SerializeToOstream(&os);
-
-    client.initiateCommunication([&](streambuf &buffer) {
-      std::istream is{&buffer};
-      myapp::WorkMessage response_message{};
-      response_message.ParseFromIstream(&is);
-
-      std::string json{};
-      auto status = MessageToJsonString(
-          response_message, &json, JsonPrintOptions{.add_whitespace = true});
-      if (status.ok()) {
-        std::cout << "Received response message: " << json << std::endl;
-      } else {
-        std::cerr << "Failed to convert response message to JSON." << std::endl;
-      }
-    });
+    sendRequest(client, id += 1, load, is_disconnected);
   }
 
   work_guard.reset();
