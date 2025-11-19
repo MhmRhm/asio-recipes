@@ -4,8 +4,8 @@
 #include <boost/asio.hpp>
 #include <google/protobuf/util/json_util.h>
 
-#include "bm_asio18_client/client.h"
-#include "bm_asio18_client_pb/WorkLoad.pb.h"
+#include "bm_asio_client/client.h"
+#include "bm_asio_client_pb/WorkLoad.pb.h"
 
 using namespace boost::asio;
 using namespace google::protobuf::util;

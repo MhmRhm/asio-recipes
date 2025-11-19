@@ -1,4 +1,4 @@
-#include "bm_qt20_server/server.h"
+#include "bm_qt_server_pool/server.h"
 
 #include <format>
 #include <iostream>
@@ -6,7 +6,7 @@
 
 #include <QThreadPool>
 
-#include "bm_qt20_server/client.h"
+#include "bm_qt_server_pool/client.h"
 
 void Server::incomingConnection(qintptr socketDescriptor) {
   auto *client =

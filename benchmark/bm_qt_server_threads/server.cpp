@@ -1,4 +1,4 @@
-#include "bm_qt19_server/server.h"
+#include "bm_qt_server_threads/server.h"
 
 #include <format>
 #include <iostream>
@@ -7,7 +7,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
-#include "bm_qt19_server/client.h"
+#include "bm_qt_server_threads/client.h"
 
 Server::Server(uint16_t port, QObject *parent,
                std::function<void(qintptr, QByteArray &)> onRequest)

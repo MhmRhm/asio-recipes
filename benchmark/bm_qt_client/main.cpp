@@ -6,8 +6,8 @@
 
 #include <google/protobuf/util/json_util.h>
 
-#include "bm_qt19_client/client.h"
-#include "bm_qt19_client_pb/WorkLoad.pb.h"
+#include "bm_qt_client/client.h"
+#include "bm_qt_client_pb/WorkLoad.pb.h"
 
 using namespace std;
 using namespace google::protobuf::util;

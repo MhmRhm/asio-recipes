@@ -7,36 +7,37 @@
 #include <QCoreApplication>
 #include <QSocketNotifier>
 #include <QThread>
-#include <QThreadPool>
 
 #include <google/protobuf/util/json_util.h>
 
-#include "bm_qt20_server/server.h"
-#include "bm_qt20_server_pb/WorkLoad.pb.h"
+#include "bm_qt_server_threads/server.h"
+#include "bm_qt_server_threads_pb/WorkLoad.pb.h"
 
 using namespace std;
 using namespace google::protobuf::util;
 
-void printMessage(const myapp::WorkMessage &requestMsg) {
+void printMessage(qintptr socketDescriptor,
+                  const myapp::WorkMessage &requestMsg) {
   std::string json{};
   auto status = MessageToJsonString(requestMsg, &json,
                                     JsonPrintOptions{.add_whitespace = true});
   if (status.ok()) {
-    std::cout << std::format("{}", json) << std::endl;
+    std::cout << std::format("Received request message from client {}:\n{}\n",
+                             socketDescriptor, json);
   } else {
     std::cerr << "Failed to convert request message to JSON." << std::endl;
   }
 }
 
 void onRequest([[maybe_unused]] qintptr socketDescriptor, QByteArray &dataBuf) {
-  // std::cout << std::format("[{}] Handling request from {}.",
-  //                          QThread::currentThreadId(), socketDescriptor)
+  // std::cout << std::format("Handling request from client {} in thread {}.",
+  //                          socketDescriptor, QThread::currentThreadId())
   //           << std::endl;
 
   myapp::WorkMessage requestMsg{};
   requestMsg.ParseFromArray(dataBuf.constData(),
                             static_cast<int>(dataBuf.size()));
-  // printMessage(requestMsg);
+  // printMessage(socketDescriptor, requestMsg);
 
   // std::this_thread::sleep_for(
   //     std::chrono::milliseconds(requestMsg.work_request().workload()));
@@ -52,22 +53,17 @@ void onRequest([[maybe_unused]] qintptr socketDescriptor, QByteArray &dataBuf) {
 }
 
 int main(int argc, char *argv[]) {
-  std::cout << std::format("[{}] Main thread.", QThread::currentThreadId())
+  std::cout << std::format("Main thread: {}.", QThread::currentThreadId())
             << std::endl;
 
   QCoreApplication app{argc, argv};
-  auto *pool{QThreadPool::globalInstance()};
-  // pool->setMaxThreadCount(1);
-  pool->setMaxThreadCount(QThread::idealThreadCount());
 
-  Server server{&app, onRequest};
-  server.listen(QHostAddress::Any, 8172);
+  Server server{8172, &app, onRequest};
+  server.start();
 
-  std::jthread shutdownThread{[&app, &server, pool]() {
+  std::jthread shutdownThread{[&app]() {
     std::cout << "Press ENTER to stop the server..." << std::endl;
     std::cin.get();
-    server.disconnectClients();
-    pool->waitForDone();
     app.quit();
   }};
 
