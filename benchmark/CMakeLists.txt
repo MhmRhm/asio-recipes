@@ -1,1 +1,5 @@
-include(Benchmarking)
+add_subdirectory(bm_asio18_client)
+add_subdirectory(bm_asio18_server)
+add_subdirectory(bm_qt19_client)
+add_subdirectory(bm_qt19_server)
+add_subdirectory(bm_qt20_server)
