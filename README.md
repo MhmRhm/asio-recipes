@@ -193,10 +193,35 @@ sudo apt-get -y install cppcheck
 sudo apt-get -y install lcov
 ```
 
-For Qt installation, download the [online installer](https://www.qt.io/download-open-source)
-and follow the setup instructions. Qt packages are also available through most
-Linux distribution repositories. If you installed Qt using the online installer,
-update the `QTDIR` path in the `CMakePresets.json` file accordingly.
+Optionally, to install Qt, download the [online installer](https://www.qt.io/download-open-source)
+and follow the setup instructions. After installation, update the `QTDIR` path in
+the `CMakePresets.json` file accordingly. If your environment supports GUI
+applications, you can complete the installation using the standard graphical
+setup. Otherwise, you can run the online installer through its command-line
+interface. To install all required components, run the following commands:
+
+```bash
+# Install Qt for X11 requirements. For more details, see the following links:
+# https://doc.qt.io/qt-6/linux-requirements.html
+# https://doc.qt.io/Qt-6/get-and-install-qt-cli.html
+
+sudo apt install \
+   libfontconfig1-dev libfreetype-dev libgtk-3-dev libx11-dev libx11-xcb-dev \
+   libxcb-cursor-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-image0-dev \
+   libxcb-keysyms1-dev libxcb-randr0-dev libxcb-render-util0-dev \
+   libxcb-shape0-dev libxcb-shm0-dev libxcb-sync-dev libxcb-util-dev \
+   libxcb-xfixes0-dev libxcb-xkb-dev libxcb1-dev libxext-dev libxfixes-dev \
+   libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev
+
+# Download and install Qt base components:
+wget https://d13lb3tujbc8s0.cloudfront.net/onlineinstallers/qt-online-installer-linux-arm64-4.10.0.run
+chmod +x ./qt-online-installer-linux-arm64-4.10.0.run
+./qt-online-installer-linux-arm64-4.10.0.run install
+
+# After the base installation, install additional components using the MaintenanceTool:
+cd ~/Qt/
+./MaintenanceTool install qt.qt6.6100.addons
+```
 
 The following tools are used in this project:
 
@@ -275,15 +300,16 @@ to the Path.
 3. **[Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)**:
 Select the "Desktop development with C++" option.
 
-4. **[Qt](https://www.qt.io/download-open-source)**: Standard setup. During
-installation, under Additional Libraries for your chosen Qt version, select the
-libraries you need. You'll likely not require any debug information files. In the
-Build Tools section, uncheck CMake. If you already have Qt installed, run the
-Maintenance Tool in your installation directory to add or install another version.
+4. **[Qt](https://www.qt.io/download-open-source)**: [Optional] Follow standard
+setup. During installation, under Additional Libraries for your chosen Qt version,
+select the libraries you need. You'll likely not require any debug information
+files. In the Build Tools section, uncheck CMake. If you already have Qt
+installed, run the Maintenance Tool in your installation directory to add or
+install another version.
 
 5. **[vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---se)**:
-Standard vcpkg setup. The `CMakePresets.json` assumes it is installed directly
-under the C directory.
+Follow step 1 of standard vcpkg setup. The `CMakePresets.json` assumes it is
+installed directly under the C directory (`C:\vcpkg`).
 
 This template includes a `CMakePresets.json` file with predefined workflows. To
 start, run the following command and review the output. If any packages are
@@ -338,12 +364,12 @@ follow these steps (replace the `<user>` with correct value):
 
 1. **Install Homebrew:**
 
-   Run the following command to install Homebrew, the macOS package manager:
+   Run the following command to install Homebrew, the macOS package manager.
+   After the installation completes, Homebrew will display a few commands that
+   you need to run manually to add it to your shell environment.
 
    ```zsh
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/<user>/.zprofile
-   eval "$(/opt/homebrew/bin/brew shellenv)"
    ```
 
 2. **Install required dependencies:**
@@ -355,34 +381,33 @@ follow these steps (replace the `<user>` with correct value):
    brew install cppcheck
    brew install clang-format
    brew install doxygen graphviz
-   ```
-
-3. **Set up LLVM for coverage reports:**
-
-   Since coverage reports require LLVM tools, we need to add them to the system's
-   PATH. You have two options:
-
-   **Option 1: Use LLVM tools without changing the default Apple Clang compiler**  
-   Add LLVM tools (`llvm-cov` and `llvm-profdata`) to the end of your PATH to
-   avoid overriding Apple's Clang compiler. Ensure that the LLVM version matches
-   the default Apple Clang version to avoid compatibility issues:
-
-   ```zsh
-   clang --version
-   brew install llvm@15
-   echo 'export PATH="$PATH:/opt/homebrew/opt/llvm@15/bin"' >> ~/.zshrc
-   ```
-
-   **Option 2: Use LLVM entirely**  
-   If you'd prefer to use the latest LLVM as your default compiler, you can
-   install it and add it to the front of your PATH:
-
-   ```zsh
    brew install llvm
-   echo 'export PATH="/opt/homebrew/opt/llvm/bin:$PATH"' >> ~/.zshrc
+   brew install pkg-config
+   brew install autoconf autoconf-archive automake libtool
    ```
 
-Make sure you restart the terminal for the changes in the PATH to take effect.
+3. **Install vcpkg:**
+
+   This template depends on vcpkg. Follow its
+   [official documentation](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started)
+   to install it. The `CMakePresets.json` file assumes that vcpkg is located in
+   the user's `/Users/<username>/vcpkg` directory. This template installs its
+   dependencies using a vcpkg [manifest file](https://learn.microsoft.com/en-us/vcpkg/consume/manifest-mode).
+
+   Installing vcpkg is straightforward and can be done with the following
+   commands:
+
+   ```zsh
+   cd $HOME
+   git clone https://github.com/microsoft/vcpkg.git
+   cd vcpkg && ./bootstrap-vcpkg.sh
+   ```
+
+4. **Install Qt:**
+
+   Optionally, to install Qt, download the [online installer](https://www.qt.io/download-open-source)
+   and follow the setup instructions. After installation, update the `QTDIR` path
+   in the `CMakePresets.json` file accordingly.
 
 ## Final Step
 
