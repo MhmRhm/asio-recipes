@@ -9,7 +9,7 @@
 #include "bm_qt_server_pool/client.h"
 
 void Server::incomingConnection(qintptr socketDescriptor) {
-  auto *client =
-      new Client{socketDescriptor, m_onRequest, m_isStopping, m_totalRequests};
+  auto *client{
+      new Client{socketDescriptor, m_onRequest, m_isStopping, m_totalRequests}};
   QThreadPool::globalInstance()->start(client);
 }

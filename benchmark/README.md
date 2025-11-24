@@ -145,6 +145,33 @@ In Qt, a `QObject` cannot be moved to another `QThread` while it has a parent; Q
 
 It’s also important to note that the `client` object itself lives in the server thread, while its internal TCP socket lives in the client thread. This means the `Client` constructor and destructor are executed in the server thread.
 
+```cpp
+Client::Client(QTcpSocket *socket, QObject *parent)
+    : QThread{parent}, m_socket{socket} {
+  m_socket->setParent(nullptr);
+  m_socket->moveToThread(this);
+}
+
+void Client::run() {
+  connect(m_socket, &QTcpSocket::disconnected, m_socket, [&]() {
+    emit disconnected();
+    quit();
+  });
+  connect(m_socket, &QTcpSocket::errorOccurred, m_socket, [&]() {
+    m_socket->close();
+  });
+  connect(m_socket, &QTcpSocket::readyRead, m_socket,
+          [&]() { receiveRequest();
+  });
+  connect(this, &Client::requestReceived, m_socket, [&]() {
+    sendResponse();
+  });
+
+  exec();
+  m_socket->deleteLater();
+}
+```
+
 In general, due to Qt’s constraints on using signals and slots across threads, designing a server in Qt is more involved compared to Boost.Asio.
 
 ### Qt Server: Thread Pool Approach
@@ -153,25 +180,77 @@ In this approach, each server inherits from `QTcpServer` instead of aggregating 
 
 The advantage of this design is that it saves memory and CPU time by avoiding the overhead of creating a separate thread for each client. Additionally, load balancing and task destruction are handled automatically.
 
-When the server detects a new connection, it creates a new task with the incoming socket descriptor and posts it to the thread pool. The `QRunnable` object implements a `run` method, which executes in the assigned thread. Inside `run`, new signal–slot connections are established, and an event loop is started. The `run` method exits the event loop automatically when the client disconnects.
+When the server detects a new connection, it creates a new task with the incoming socket descriptor and posts it to the thread pool.
+
+```cpp
+void Server::incomingConnection(qintptr socketDescriptor) {
+  auto *client{
+      new Client{socketDescriptor, m_onRequest, m_isStopping, m_totalRequests}};
+  QThreadPool::globalInstance()->start(client);
+}
+```
+
+The `QRunnable` object implements a `run` method, which executes in the assigned thread. Inside `run`, new signal–slot connections are established, and an event loop is started. The `run` method exits the event loop automatically when the client disconnects.
+
+From a design perspective, this approach offers several advantages: we don’t need to manage the socket’s parent object or move it to a separate thread, and cleanup happens automatically when the event loop finishes.
+
+The main drawback is that we need to periodically check whether the server has stopped. Because `QRunnable` does not inherit from `QObject`, server cannot emit signals to notify the clients. If this behavior is not desirable, an alternative is to emit a “server stopped” signal elsewhere and connect it to a data member in each client. This allows clients to detect the shutdown without relying on `QRunnable` directly.
+
+```cpp
+void Client::run() {
+  QEventLoop loop{};
+  QTcpSocket socket{};
+  QTimer timer{};
+
+  socket.setSocketDescriptor(m_socketDescriptor)
+
+  QObject::connect(&socket, &QTcpSocket::disconnected, &socket,
+                   [&]() { loop.quit(); });
+  QObject::connect(&socket, &QTcpSocket::errorOccurred, &socket, [&]() {
+    socket.close();
+  });
+  QObject::connect(&socket, &QTcpSocket::readyRead, &socket, [&]() {
+    onReadyRead(socket);
+  });
+
+  QObject::connect(&timer, &QTimer::timeout, &timer, [&]() {
+    if (m_isStopping.load()) {
+      socket.close();
+      loop.quit();
+    }
+  });
+
+  loop.exec();
+  std::cout << std::format("[{}] Client {} disconnected.",
+                           QThread::currentThreadId(), m_socketDescriptor)
+            << std::endl;
+}
+```
 
 ## Benchmarking Methodology
 
-To avoid network latency affecting our benchmarking results and to measure the raw performance of these TCP client and server applications, we ran both the client and server on the same host using the `localhost` network.
+To avoid network latency affecting our benchmarking results, I ran both the client and server on the same host using the `localhost` network. The client initiates communication by sending a request to the server and starts the next round only after receiving the server’s response. Performance is measured as the number of requests handled by the server in 10 seconds. The requests and responses are simple Protobuf structures, serialized and deserialized on both the client and server sides to simulate a typical workflow.
 
-The client initiates communication by sending a request to the server and starts the next round only after receiving the server’s response. Performance is measured as the number of requests handled by the server in 10 seconds.
+**Benchmark results (requests per 10 seconds, averaged over 10 runs) on a Windows Intel machine:**
 
-The requests and responses are simple Protobuf structures, serialized and deserialized on both the client and server sides to simulate a typical workflow.
-
-**Benchmark results (requests per 10 seconds, averaged over 10 runs) on a Windows machine:**
-
-| Client      | Server                         | Requests/s |
+| Client      | Server                         | Requests/10s |
 | ----------- | ------------------------------ | ---------- |
 | Qt client   | Qt server (threads per client) | 43,096.4   |
 | Qt client   | Qt server (thread pool)        | 48,084.3   |
-| Asio client | Asio server                    | 91,281.5   |
 | Qt client   | Asio server                    | 76,542.4   |
-| Asio client | Qt server (thread pool)        | 104,661.6  |
 | Asio client | Qt server (threads per client) | 92,324.4   |
+| Asio client | Qt server (thread pool)        | 104,661.6  |
+| Asio client | Asio server                    | 91,281.5   |
 
-In experiments on a virtual machine, the Boost.Asio implementation performed significantly worse. Each combination was run 10 times, and the values shown are the averages.
+**Benchmark results (requests per 10 seconds, averaged over 10 runs) on a Mac Mini M4 machine:**
+
+| Client      | Server                         | Requests/10s |
+| ----------- | ------------------------------ | ---------- |
+| Qt client   | Qt server (threads per client) | 611,292.1  |
+| Qt client   | Qt server (thread pool)        | 609,290.5  |
+| Qt client   | Asio server                    | 264,311.3  |
+| Asio client | Qt server (threads per client) | 230,921.8  |
+| Asio client | Qt server (thread pool)        | 461,792.6  |
+| Asio client | Asio server                    | 206,935.3  |
+
+In experiments on virtual machines, the Boost.Asio implementation performed significantly worse. Each combination was run 10 times, and the values shown are the averages.

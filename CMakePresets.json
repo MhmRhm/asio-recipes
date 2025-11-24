@@ -23,7 +23,7 @@
 				"CMAKE_TOOLCHAIN_FILE": "$penv{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"VCPKG_INSTALL_OPTIONS": "--debug",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "$penv{HOME}/Qt/6.10.0/gcc_arm64"
+				"QTDIR": "$penv{HOME}/Qt/6.10.1/gcc_arm64"
 			}
 		},
 		{
@@ -48,7 +48,7 @@
 				"CMAKE_TOOLCHAIN_FILE": "$penv{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"VCPKG_INSTALL_OPTIONS": "--debug",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "$penv{HOME}/Qt/6.10.0/gcc_arm64"
+				"QTDIR": "$penv{HOME}/Qt/6.10.1/gcc_arm64"
 			}
 		},
 		{
@@ -77,7 +77,7 @@
 				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"VCPKG_INSTALL_OPTIONS": "--debug",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "C:/Qt/6.10.0/msvc2022_64"
+				"QTDIR": "C:/Qt/6.10.1/msvc2022_64"
 			}
 		},
 		{
@@ -106,7 +106,7 @@
 				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"VCPKG_INSTALL_OPTIONS": "--debug",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "C:/Qt/6.10.0/msvc2022_64"
+				"QTDIR": "C:/Qt/6.10.1/msvc2022_64"
 			}
 		},
 		{
@@ -201,7 +201,7 @@
 				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"VCPKG_INSTALL_OPTIONS": "--debug",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "C:/Qt/6.10.0/msvc2022_arm64"
+				"QTDIR": "C:/Qt/6.10.1/msvc2022_arm64"
 			}
 		},
 		{
@@ -232,7 +232,7 @@
 				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 				"VCPKG_INSTALL_OPTIONS": "--debug",
 				"QT_DEBUG_FIND_PACKAGE": "ON",
-				"QTDIR": "C:/Qt/6.10.0/msvc2022_arm64"
+				"QTDIR": "C:/Qt/6.10.1/msvc2022_arm64"
 			}
 		},
 		{
