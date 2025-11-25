@@ -32,6 +32,7 @@ void Server::initiateAccept() {
           throw boost::system::system_error(ec);
         }
         initiateAccept();
+        client.socket().set_option(boost::asio::ip::tcp::no_delay{true});
         client.initiateCommunication(m_onRequest);
       });
 }

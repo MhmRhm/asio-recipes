@@ -23,6 +23,8 @@ void Client::run() {
                            QThread::currentThreadId(), m_socketDescriptor)
             << std::endl;
 
+  socket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
+
   QObject::connect(&socket, &QTcpSocket::disconnected, &socket,
                    [&]() { loop.quit(); });
   QObject::connect(&socket, &QTcpSocket::errorOccurred, &socket, [&]() {

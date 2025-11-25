@@ -5,8 +5,10 @@
 
 Client::Client(QObject *parent)
     : QObject{parent}, m_socket{this}, m_timeoutTimer{this} {
-  connect(&m_socket, &QTcpSocket::connected, this,
-          []() { std::cout << std::format("Connectd to host.") << std::endl; });
+  connect(&m_socket, &QTcpSocket::connected, this, [&]() {
+    std::cout << std::format("Connectd to host.") << std::endl;
+    m_socket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
+  });
   connect(&m_socket, &QTcpSocket::disconnected, this, [&]() {
     std::cout << std::format("Disconnected from host.") << std::endl;
     m_timeoutTimer.stop();

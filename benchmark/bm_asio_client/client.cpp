@@ -9,9 +9,14 @@ boost::system::error_code Client::connect(const std::string &address,
 
   boost::system::error_code ec;
   m_socket.open(endpoint.protocol(), ec);
-  if (!ec) {
-    m_socket.connect(endpoint, ec);
+  if (ec) {
+    return ec;
   }
+  m_socket.set_option(boost::asio::ip::tcp::no_delay{true}, ec);
+  if (ec) {
+    return ec;
+  }
+  m_socket.connect(endpoint, ec);
   return ec;
 }
 

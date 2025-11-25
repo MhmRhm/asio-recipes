@@ -8,6 +8,7 @@ Client::Client(QTcpSocket *socket, QObject *parent,
                std::atomic<int> &totalRequests)
     : QThread{parent}, m_socket{socket}, m_onRequest{onRequest},
       m_totalRequests{totalRequests} {
+  m_socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
   m_socket->setParent(nullptr);
   m_socket->moveToThread(this);
 }
