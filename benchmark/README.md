@@ -6,6 +6,8 @@ The connection between a client and a server is also fragile. Failures can occur
 
 In this work, I explore these challenges using two well-known networking frameworks: Boost.Asio and the Qt Networking module. Five projects were evaluated: two implement a TCP client and server using Boost.Asio, two provide equivalent implementations using Qt, and a fifth introduces an alternative design for the Qt-based server. All clients and servers are assumed to be non-blocking so they can run alongside the application's main event loop. After examining the design of these different approaches, we will test them to see how they perform in practice.
 
+You can find the source code on GitHub at [https://github.com/MhmRhm/asio-recipes/tree/main/benchmark](https://github.com/MhmRhm/asio-recipes/tree/main/benchmark).
+
 ## Boost.Asio Client Implementation
 
 Boost.Asio centers around the **io_context** class, regardless of whether your implementation is blocking or non-blocking. Every socket must be constructed with an `io_context` instance. After that, you can open a socket and use it in a blocking manner—for example, by calling `read_some` or `write_some`, both of which block until data arrives or is sent.
@@ -227,30 +229,90 @@ void Client::run() {
 }
 ```
 
+## Timeouts
+
+Both libraries implement timeouts using timers.
+In **Boost.Asio**, when a timer expires it triggers a callback, where you can close the socket and notify the user gracefully:
+
+```cpp
+void Client::checkTimeout(const boost::system::error_code &ec) {
+  if (!ec) {
+    m_socket.cancel();
+    m_socket.close();
+  }
+}
+
+void Client::initiateReceiveResponse() {
+  m_timeoutTimer.expires_after(std::chrono::seconds{5});
+  m_timeoutTimer.async_wait(
+      [this](const boost::system::error_code &ec) { checkTimeout(ec); });
+  boost::asio::async_read();
+}
+```
+
+In **Qt**, after sending the request the client starts a single-shot timer.
+If the timer expires, the `timeout` signal triggers the timeout handler, which can cleanly abort the socket connection. The socket’s `disconnected` signal is then used to stop the timer:
+
+```cpp
+void Client::onTimeout() {
+  std::cout << "Timeout occurred." << std::endl;
+  m_socket.abort();
+}
+
+connect(&m_socket, &QTcpSocket::disconnected, this, [&]() {
+  m_timeoutTimer.stop();
+});
+m_timeoutTimer.setInterval(5000);
+m_timeoutTimer.setSingleShot(true);
+m_timeoutTimer.callOnTimeout(this, &Client::onTimeout);
+```
+
 ## Benchmarking Methodology
 
-To avoid network latency affecting our benchmarking results, I ran both the client and server on the same host using the `localhost` network. The client initiates communication by sending a request to the server and starts the next round only after receiving the server’s response. Performance is measured as the number of requests handled by the server in 10 seconds. The requests and responses are simple Protobuf structures, serialized and deserialized on both the client and server sides to simulate a typical workflow.
+To avoid network latency affecting our benchmarking results, for single-threaded tests I ran both the client and server on the same host using the `localhost` network. The client initiates communication by sending a request to the server and starts the next round only after receiving the server’s response. Performance is measured as the number of requests handled by the server in 10 seconds. The requests and responses are simple Protobuf structures, serialized and deserialized on both the client and server sides to simulate a typical workflow.
 
-**Benchmark results (requests per 10 seconds, averaged over 10 runs) on a Windows Intel machine:**
+I also ran the tests with the `TCP_NODELAY` option enabled on the sockets. Below has the benchmarking results for an Asio server running on a Windows machine and clients running on a Mac Mini M4. By changing only this single option, we achieved more than a **90× improvement** in performance—from **2,097.5 requests** to **191,174.2 requests**.
 
-| Client      | Server                         | Requests/10s |
-| ----------- | ------------------------------ | ---------- |
-| Qt client   | Qt server (threads per client) | 43,096.4   |
-| Qt client   | Qt server (thread pool)        | 48,084.3   |
-| Qt client   | Asio server                    | 76,542.4   |
-| Asio client | Qt server (threads per client) | 92,324.4   |
-| Asio client | Qt server (thread pool)        | 104,661.6  |
-| Asio client | Asio server                    | 91,281.5   |
+The key takeaway is that achieving the best performance often requires experimentation. Factors such as the amount of data being transferred, required latency, and the number of concurrent clients all play a significant role in determining the optimal configuration.
 
-**Benchmark results (requests per 10 seconds, averaged over 10 runs) on a Mac Mini M4 machine:**
+**Benchmark results (requests in 10 seconds, averaged over 10 runs):**
 
-| Client      | Server                         | Requests/10s |
-| ----------- | ------------------------------ | ---------- |
-| Qt client   | Qt server (threads per client) | 611,292.1  |
-| Qt client   | Qt server (thread pool)        | 609,290.5  |
-| Qt client   | Asio server                    | 264,311.3  |
-| Asio client | Qt server (threads per client) | 230,921.8  |
-| Asio client | Qt server (thread pool)        | 461,792.6  |
-| Asio client | Asio server                    | 206,935.3  |
+| Server (Intel)                 | Client (Intel) | Default      | TCP_NODELAY |
+| ------------------------------ | -------------- | ------------ | ----------- |
+| Asio server                    | Asio client    | 91,281.5     | 74,550.3    |
+| Asio server                    | Qt client      | 76,542.4     | 76,532.9    |
+| Qt server (threads per client) | Qt client      | 43,096.4     | 47,855.6    |
+| Qt server (threads per client) | Asio client    | 92,324.4     | 93,776.1    |
+| Qt server (thread pool)        | Qt client      | 48,084.3     | 48,819.3    |
+| Qt server (thread pool)        | Asio client    | 104,661.6    | 116,093.5   |
 
-In experiments on virtual machines, the Boost.Asio implementation performed significantly worse. Each combination was run 10 times, and the values shown are the averages.
+| Server (M4)                    | Client (M4) | Default      | TCP_NODELAY |
+| ------------------------------ | ----------- | ------------ | ----------- |
+| Asio server                    | Asio client | 206,935.3    | 200,891.7   |
+| Asio server                    | Qt client   | 264,311.3    | 339,798.3   |
+| Qt server (threads per client) | Asio client | 230,921.8    | 224,973.7   |
+| Qt server (threads per client) | Qt client   | 611,292.1    | 601,358.5   |
+| Qt server (thread pool)        | Asio client | 461,792.6    | 462,812.3   |
+| Qt server (thread pool)        | Qt client   | 609,290.5    | 615,127.0   |
+
+The following describes a multithreaded test scenario. I connected two machines directly using a LAN cable, assigned static IP addresses to both, and then ran 10 client instances on one machine with a single server instance running on the other.
+
+**Benchmark results (requests from 10 clients in 10 seconds, averaged over 10 runs):**
+
+| Server (Intel)                 | Clients (M4) | Default      | TCP_NODELAY |
+| ------------------------------ | ------------ | ------------ | ----------- |
+| Asio server                    | Asio client  | 2,097.5      | 191,174.2   |
+| Asio server                    | Qt client    | 104,227.3    | 207,779.3   |
+| Qt server (threads per client) | Asio client  | 2,109.5      | 135,172.2   |
+| Qt server (threads per client) | Qt client    | 140,278.7    | 137,324.6   |
+| Qt server (thread pool)        | Asio client  | 4,218.5      | 136,204.3   |
+| Qt server (thread pool)        | Qt client    | 138,677.6    | 137,728.3   |
+
+| Server (M4)                    | Clients (Intel) | Default   | TCP_NODELAY |
+| ------------------------------ | --------------- | ----------| ----------- |
+| Asio server                    | Asio client     | 2,029.1   | 200,925.7   |
+| Asio server                    | Qt client       | 2,026.4   | 108,777.2   |
+| Qt server (threads per client) | Asio client     | 109,134.0 | 214,652.5   |
+| Qt server (threads per client) | Qt client       | 106,598.7 | 117,003.9   |
+| Qt server (thread pool)        | Asio client     | 216,184.2 | 267,041.5   |
+| Qt server (thread pool)        | Qt client       | 109,924.4 | 115,258.7   |
