@@ -8,7 +8,6 @@
 void Client::run() {
   QEventLoop loop{};
   QTcpSocket socket{};
-  QTimer timer{};
   int requestCount{};
 
   if (!socket.setSocketDescriptor(m_socketDescriptor)) {
@@ -25,8 +24,8 @@ void Client::run() {
 
   socket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
 
-  QObject::connect(&socket, &QTcpSocket::disconnected, &socket,
-                   [&]() { loop.quit(); });
+  QObject::connect(&socket, &QTcpSocket::disconnected, &loop,
+                   &QEventLoop::quit);
   QObject::connect(&socket, &QTcpSocket::errorOccurred, &socket, [&]() {
     std::cout << std::format("[{}] Error {} occured: {}.",
                              QThread::currentThreadId(),
@@ -40,15 +39,7 @@ void Client::run() {
     requestCount += 1;
   });
 
-  timer.setInterval(1000);
-  timer.setSingleShot(false);
-  QObject::connect(&timer, &QTimer::timeout, &timer, [&]() {
-    if (m_isStopping.load()) {
-      socket.close();
-      loop.quit();
-    }
-  });
-  timer.start();
+  QObject::connect(&m_stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
   loop.exec();
   m_totalRequests += requestCount;

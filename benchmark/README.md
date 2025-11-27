@@ -196,18 +196,19 @@ The `QRunnable` object implements a `run` method, which executes in the assigned
 
 From a design perspective, this approach offers several advantages: we don’t need to manage the socket’s parent object or move it to a separate thread, and cleanup happens automatically when the event loop finishes.
 
-The main drawback is that we need to periodically check whether the server has stopped. Because `QRunnable` does not inherit from `QObject`, server cannot emit signals to notify the clients. If this behavior is not desirable, an alternative is to emit a “server stopped” signal elsewhere and connect it to a data member in each client. This allows clients to detect the shutdown without relying on `QRunnable` directly.
+One complication with this approach is notifying clients that the server is about to shut down. Since `QRunnable` does not inherit from `QObject`, the server cannot emit signals directly to the client runnables. A practical solution is to place a `QObject` member inside the `Server` class, pass a reference to this object to each client runnable, and connect one of its signals to the client’s event loop `quit()` slot.
+
+In the example below, I use a `QTimer` as the shared `QObject`. When the server is about to shut down, it starts the timer with an interval of 0. The timer’s `timeout` signal is then emitted, causing each connected client’s event loop to exit.
 
 ```cpp
 void Client::run() {
   QEventLoop loop{};
   QTcpSocket socket{};
-  QTimer timer{};
 
   socket.setSocketDescriptor(m_socketDescriptor)
 
-  QObject::connect(&socket, &QTcpSocket::disconnected, &socket,
-                   [&]() { loop.quit(); });
+  QObject::connect(&socket, &QTcpSocket::disconnected, &loop,
+                   &QEventLoop::quit);
   QObject::connect(&socket, &QTcpSocket::errorOccurred, &socket, [&]() {
     socket.close();
   });
@@ -215,18 +216,36 @@ void Client::run() {
     onReadyRead(socket);
   });
 
-  QObject::connect(&timer, &QTimer::timeout, &timer, [&]() {
-    if (m_isStopping.load()) {
-      socket.close();
-      loop.quit();
-    }
-  });
+  QObject::connect(&m_stopTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
   loop.exec();
   std::cout << std::format("[{}] Client {} disconnected.",
                            QThread::currentThreadId(), m_socketDescriptor)
             << std::endl;
 }
+```
+
+With this change, the server application can now perform a graceful shutdown:
+
+```cpp
+// server.h
+void disconnectClients() {
+  QMetaObject::invokeMethod(&m_stopTimer, qOverload<>(&QTimer::start));
+}
+
+// main.cpp
+std::jthread shutdownThread{[&app, &server, pool]() {
+  std::cout << "Press ENTER to stop the server..." << std::endl;
+  std::cin.get();
+
+  QMetaObject::invokeMethod(&server, &Server::close);
+  while (server.isListening())
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  server.disconnectClients();
+  pool->waitForDone();
+  app.quit();
+}};
 ```
 
 ## Timeouts

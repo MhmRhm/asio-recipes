@@ -66,6 +66,11 @@ int main(int argc, char *argv[]) {
   std::jthread shutdownThread{[&app, &server, pool]() {
     std::cout << "Press ENTER to stop the server..." << std::endl;
     std::cin.get();
+
+    QMetaObject::invokeMethod(&server, &Server::close);
+    while (server.isListening())
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
     server.disconnectClients();
     pool->waitForDone();
     app.quit();

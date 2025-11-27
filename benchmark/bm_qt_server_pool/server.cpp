@@ -10,6 +10,6 @@
 
 void Server::incomingConnection(qintptr socketDescriptor) {
   auto *client{
-      new Client{socketDescriptor, m_onRequest, m_isStopping, m_totalRequests}};
+      new Client{socketDescriptor, m_onRequest, m_stopTimer, m_totalRequests}};
   QThreadPool::globalInstance()->start(client);
 }

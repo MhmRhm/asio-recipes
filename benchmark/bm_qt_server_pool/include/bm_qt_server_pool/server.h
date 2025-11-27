@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QTcpServer>
+#include <QTimer>
 
 class Server : public QTcpServer {
   Q_OBJECT
 private:
   std::function<void(qintptr, QByteArray &)> m_onRequest;
-  std::atomic<bool> m_isStopping{};
+  QTimer m_stopTimer{};
   std::atomic<int> m_totalRequests{};
 
 public:
@@ -15,7 +16,9 @@ public:
       : QTcpServer{parent}, m_onRequest{onRequest} {}
   ~Server() override = default;
 
-  void disconnectClients() { m_isStopping.store(true); }
+  void disconnectClients() {
+    QMetaObject::invokeMethod(&m_stopTimer, qOverload<>(&QTimer::start));
+  }
   int getTotalRequests() const { return m_totalRequests.load(); }
 
 protected:
