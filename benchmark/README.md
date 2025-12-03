@@ -292,8 +292,6 @@ To avoid network latency affecting our benchmarking results, for single-threaded
 
 I also ran the tests with the `TCP_NODELAY` option enabled on the sockets. Below has the benchmarking results for an Asio server running on a Windows machine and clients running on a Mac Mini M4. By changing only this single option, we achieved more than a **90× improvement** in performance—from **2,097.5 requests** to **191,174.2 requests**.
 
-The key takeaway is that achieving the best performance often requires experimentation. Factors such as the amount of data being transferred, required latency, and the number of concurrent clients all play a significant role in determining the optimal configuration.
-
 **Benchmark results (requests in 10 seconds, averaged over 10 runs):**
 
 | Server (Intel)                 | Client (Intel) | Default      | TCP_NODELAY |
@@ -335,3 +333,11 @@ The following describes a multithreaded test scenario. I connected two machines 
 | Qt server (threads per client) | Qt client       | 106,598.7 | 117,003.9   |
 | Qt server (thread pool)        | Asio client     | 216,184.2 | 267,041.5   |
 | Qt server (thread pool)        | Qt client       | 109,924.4 | 115,258.7   |
+
+## Closing Thoughts
+
+Designing both the client and server sides of an application comes with many challenges, and even a clean, well-structured design does not guarantee good performance. The main lesson is that performance is something you discover through experimentation, not something you can assume.
+
+As the benchmark results showed, different operating systems behave differently, and even two very similar concurrent Qt TCP server designs can diverge in performance. We also saw how a single socket option can significantly change throughput and latency. Factors such as data volume, latency requirements, and the number of concurrent clients all influence what “optimal” really means.
+
+Ultimately, you cannot know whether you’re getting the best performance from your hardware unless you benchmark different approaches in a controlled environment—free from outside interference—so that every candidate can be evaluated fairly and accurately.
