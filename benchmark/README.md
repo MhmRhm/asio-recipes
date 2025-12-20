@@ -6,8 +6,6 @@ The connection between a client and a server is also fragile. Failures can occur
 
 In this work, I explore these challenges using two well-known networking frameworks: Boost.Asio and the Qt Networking module. Five projects were evaluated: two implement a TCP client and server using Boost.Asio, two provide equivalent implementations using Qt, and a fifth introduces an alternative design for the Qt-based server. All clients and servers are assumed to be non-blocking so they can run alongside the application's main event loop. After examining the design of these different approaches, we will test them to see how they perform in practice.
 
-You can find the source code on GitHub at [https://github.com/MhmRhm/asio-recipes/tree/main/benchmark](https://github.com/MhmRhm/asio-recipes/tree/main/benchmark).
-
 ## Boost.Asio Client Implementation
 
 Boost.Asio centers around the **io_context** class, regardless of whether your implementation is blocking or non-blocking. Every socket must be constructed with an `io_context` instance. After that, you can open a socket and use it in a blocking manner—for example, by calling `read_some` or `write_some`, both of which block until data arrives or is sent.
