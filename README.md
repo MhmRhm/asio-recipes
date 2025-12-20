@@ -33,8 +33,3 @@ cmake --workflow --preset windows-clang-release
 # or
 cmake --workflow --preset windows-default-release
 ```
-
-## Recipes
-
-Below is a list of the available recipes and what you can learn from each one:
-1. **asio1:** Learn how to define IP addresses and endpoints using Boost.Asio.
