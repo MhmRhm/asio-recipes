@@ -21,8 +21,6 @@ dependencies first.
 * **Linux setup:** Follow the instructions [here](https://github.com/MhmRhm/SeeMake?tab=readme-ov-file#setting-up-linux).
 * **Windows setup:** Follow the instructions [here](https://github.com/MhmRhm/SeeMake?tab=readme-ov-file#setting-up-windows).
 
-> **Note:** Qt is **not required**, so you can skip its installation.
-
 Once the dependencies are installed, you can build all executables using the
 following commands:
 
